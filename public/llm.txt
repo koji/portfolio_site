@@ -1,0 +1,46 @@
+Project: Personal Portfolio Website
+
+Core Purpose:
+This project is a personal portfolio website for Koji, a developer and creator. It showcases professional work experience, personal projects, an "About Me" section, and contact information. The website aims to present Koji's skills, experience, and personality in a visually appealing and interactive manner.
+
+Key Features:
+- Single Page Application (SPA) with smooth scrolling navigation.
+- Sections:
+    - Home (Hero): Introduction with a call to action.
+    - About: Information about Koji's developer journey, philosophy, and tech stack.
+    - Work Projects: Displays professional projects with descriptions, technologies, highlights, and links.
+    - Personal Projects: Showcases personal experiments and open-source contributions with descriptions, technologies, status, category, and links (GitHub, Live Demo).
+    - Contact: Provides ways to get in touch, including an email address and links to a blog and direct email.
+- Responsive Design: Adapts to various screen sizes (desktop, tablet, mobile).
+- Theme Toggling: Supports light, dark, and system preference themes.
+- Interactive UI: Utilizes buttons, cards, badges, and dropdown menus for a dynamic user experience.
+- Animations: Subtle animations for section loading, hover effects, and background elements.
+- Custom Shader Background: A Three.js powered animated bonsai-themed background (`BonsaiShaderBackground.tsx`) for visual interest.
+- Multilingual Elements: Incorporates Japanese text for stylistic and personal branding purposes.
+
+Main Technologies Used:
+- Frontend Framework: Next.js (React)
+- Language: TypeScript
+- UI Components: Shadcn/UI (customizable components built with Radix UI and Tailwind CSS)
+    - Specific components used: Card, Button, Badge, DropdownMenu, Dialog (implied by shadcn/ui usage, though not explicitly in provided files).
+- Styling: Tailwind CSS
+- 3D Graphics/Animation: Three.js (for the `BonsaiShaderBackground`)
+- Icons: Lucide React
+- State Management: React Hooks (`useState`, `useEffect`)
+- Navigation: Client-side smooth scrolling to sections.
+
+Directory Structure & Key Components (src/components):
+- `Hero.tsx`: The landing section of the website.
+- `About.tsx`: Section describing Koji, his philosophy, and tech stack.
+- `WorkProjects.tsx`: Component to display professional projects.
+- `PersonalProjects.tsx`: Component to display personal projects.
+- `Contact.tsx`: Contact information and form/links.
+- `Navigation.tsx`: Handles site navigation (desktop and mobile), including a dropdown for projects and theme toggle integration.
+- `ThemeToggle.tsx`: Component for switching between light, dark, and system themes.
+- `BonsaiShaderBackground.tsx`: A custom Three.js shader for an animated background.
+- `ProjectLink.tsx`: A reusable component for "View Project" buttons.
+- `ui/`: Contains components from Shadcn/UI (e.g., `button.tsx`, `card.tsx`, `badge.tsx`).
+- `data/`: Likely contains data for projects (e.g., `workPrjData.ts`, `personalPrjData.ts`).
+
+Overall Architecture:
+The application is structured as a single-page website built with Next.js and React. Components are well-defined and modular, promoting reusability and maintainability. Styling is primarily handled by Tailwind CSS, with custom UI components from Shadcn/UI. State management is local to components using React Hooks. The `BonsaiShaderBackground` adds a unique visual element using Three.js.

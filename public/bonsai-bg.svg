@@ -1,0 +1,35 @@
+
+<svg width="800" height="800" viewBox="0 0 800 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <g opacity="0.8">
+    <!-- Tree Trunk -->
+    <path d="M400 650C400 650 380 600 390 550C400 500 410 480 400 450C390 420 360 400 370 370C380 340 410 330 400 300C390 270 360 260 370 230C380 200 420 190 400 160C380 130 350 140 340 110C330 80 370 70 350 40" stroke="currentColor" stroke-width="8" stroke-linecap="round" />
+    
+    <!-- Main Branches -->
+    <path d="M400 450C400 450 430 440 460 450C490 460 510 490 510 490" stroke="currentColor" stroke-width="6" stroke-linecap="round" />
+    <path d="M400 450C400 450 370 430 340 440C310 450 290 480 290 480" stroke="currentColor" stroke-width="6" stroke-linecap="round" />
+    <path d="M400 300C400 300 430 290 450 300C470 310 490 340 490 340" stroke="currentColor" stroke-width="5" stroke-linecap="round" />
+    <path d="M400 300C400 300 370 290 350 300C330 310 310 330 310 330" stroke="currentColor" stroke-width="5" stroke-linecap="round" />
+    
+    <!-- Small Branches -->
+    <path d="M370 370C370 370 340 360 330 380" stroke="currentColor" stroke-width="4" stroke-linecap="round" />
+    <path d="M370 370C370 370 390 350 410 370" stroke="currentColor" stroke-width="4" stroke-linecap="round" />
+    <path d="M370 230C370 230 340 220 330 240" stroke="currentColor" stroke-width="4" stroke-linecap="round" />
+    <path d="M370 230C370 230 390 210 410 230" stroke="currentColor" stroke-width="4" stroke-linecap="round" />
+    
+    <!-- Foliage -->
+    <circle cx="510" cy="490" r="20" fill="currentColor" opacity="0.7" />
+    <circle cx="290" cy="480" r="18" fill="currentColor" opacity="0.7" />
+    <circle cx="490" cy="340" r="15" fill="currentColor" opacity="0.7" />
+    <circle cx="310" cy="330" r="14" fill="currentColor" opacity="0.7" />
+    <circle cx="330" cy="380" r="10" fill="currentColor" opacity="0.7" />
+    <circle cx="410" cy="370" r="10" fill="currentColor" opacity="0.7" />
+    <circle cx="330" cy="240" r="10" fill="currentColor" opacity="0.7" />
+    <circle cx="410" cy="230" r="10" fill="currentColor" opacity="0.7" />
+    <circle cx="350" cy="40" r="12" fill="currentColor" opacity="0.7" />
+    <circle cx="340" cy="110" r="13" fill="currentColor" opacity="0.7" />
+    <circle cx="400" cy="160" r="15" fill="currentColor" opacity="0.7" />
+    
+    <!-- Pot -->
+    <path d="M320 650H480L450 700H350L320 650Z" fill="currentColor" opacity="0.9" stroke="currentColor" stroke-width="5" />
+  </g>
+</svg>
