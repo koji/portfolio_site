@@ -15,7 +15,7 @@ export const workProjects: WorkProject[] = [
     title: 'Opentrons Desktop App/Touchscreen App',
     company: 'Opentrons',
     description:
-      'Led the complete redesign and development of a modern e-commerce platform serving 100k+ users',
+      "Develop Opentrons Desktop App and Touchscreen App and maintain Opentrons' UI components",
     technologies: [
       'React',
       'TypeScript',
@@ -27,9 +27,9 @@ export const workProjects: WorkProject[] = [
     ],
     period: '2022 - Present',
     highlights: [
-      'Improved conversion rate by 35%',
-      'Reduced page load time by 60%',
-      'Implemented accessibility standards',
+      'Added a new feature when re-designing the Desktop app',
+      'Setup touchscreen app dev environment and developed 40% of touch screen app UI',
+      'Increased test coverage by 5%',
     ],
     link: 'https://github.com/Opentrons/opentrons',
   },
@@ -37,7 +37,8 @@ export const workProjects: WorkProject[] = [
     id: '2',
     title: 'Opentrons AI prototype',
     company: 'Opentrons',
-    description: 'Developed Opentrons AI prototype frontend',
+    description:
+      'Designed frontend architecture and built Opentrons AI prototype frontend',
     technologies: [
       'React',
       'TypeScript',
