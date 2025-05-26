@@ -8,7 +8,7 @@ import PersonalProjects from '@/components/PersonalProjects';
 import Contact from '@/components/Contact';
 import BonsaiShaderBackground from '@/components/BonsaiShaderBackground';
 
-const Index = () => {
+export const Index = () => {
   useEffect(() => {
     // Smooth scrolling polyfill for older browsers
     if (!('scrollBehavior' in document.documentElement.style)) {
@@ -38,5 +38,3 @@ const Index = () => {
     </div>
   );
 };
-
-export default Index;
