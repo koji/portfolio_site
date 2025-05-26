@@ -1,5 +1,7 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
+import { frontendTechStack, otherTechStack } from '@/data/techStackData';
+
 const About = () => {
   return <section id="about" className="py-20 px-4 sm:px-6 lg:px-8 relative">
     {/* Background Elements */}
@@ -70,7 +72,7 @@ const About = () => {
                 <div>
                   <h4 className="font-medium text-foreground mb-2">Frontend</h4>
                   <div className="flex flex-wrap gap-2">
-                    {['React', 'Next.js', 'TypeScript', 'styled-components', 'Tailwind CSS', 'Redux', 'webpack', 'vite', 'jest', 'vitest'].map(tech => <span key={tech} className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium">
+                    {frontendTechStack.map(tech => <span key={tech} className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium">
                       {tech}
                     </span>)}
                   </div>
@@ -79,7 +81,7 @@ const About = () => {
                 <div>
                   <h4 className="font-medium text-foreground mb-2">Backend & Tools</h4>
                   <div className="flex flex-wrap gap-2">
-                    {['Node.js', 'Python', 'Git', 'Docker', 'Figma'].map(tech => <span key={tech} className="px-3 py-1 bg-secondary/50 text-secondary-foreground rounded-full text-sm font-medium">
+                    {otherTechStack.map(tech => <span key={tech} className="px-3 py-1 bg-secondary/50 text-secondary-foreground rounded-full text-sm font-medium">
                       {tech}
                     </span>)}
                   </div>
