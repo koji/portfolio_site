@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { personalProjects } from '@/components/data/personalPrjData';
+import { personalProjects } from '@/data/personalPrjData';
 
 interface PersonalProject {
   id: string;
