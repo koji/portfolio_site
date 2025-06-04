@@ -236,7 +236,7 @@ export const personalProjects: PersonalProject[] = [
     technologies: ['react', 'typescript', 'storybook', 'Netlify'],
     liveUrl: 'https://nes-components.netlify.com/',
     githubUrl: 'https://github.com/koji/react-nes-components',
-    status: 'completed',
+    status: 'in-progress',
     category: 'library', // Described as a react-component / npm package
   },
   {
@@ -255,8 +255,7 @@ export const personalProjects: PersonalProject[] = [
     description: 'I led to add Japanese translation to p5js web editor.',
     technologies: ['javascript', 'react', 'i18n'],
     liveUrl: 'https://editor.p5js.org/',
-    githubUrl:
-      'https://github.com/processing/p5.js-web-editor/releases/tag/v1.2.0',
+    githubUrl: 'https://github.com/koji/p5.js-web-editor',
     status: 'in-progress',
     category: 'web', // Contribution to a web editor
   },
