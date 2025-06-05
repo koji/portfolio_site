@@ -65,7 +65,7 @@ const PersonalProjects = () => {
                     </div>
                   </div>
                   <Badge
-                    className={`text-xs px-2 py-1 ${statusColors[project.status]} border-0`}
+                    className={`w-28 flex items-center justify-center text-xs px-2 py-1 ${statusColors[project.status]} border-0`}
                   >
                     {project.status.replace('-', ' ')}
                   </Badge>
