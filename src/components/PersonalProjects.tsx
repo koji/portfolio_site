@@ -1,32 +1,20 @@
-
-import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { personalProjects } from '@/data/personalPrjData';
-
-interface PersonalProject {
-  id: string;
-  title: string;
-  description: string;
-  technologies: string[];
-  githubUrl?: string;
-  liveUrl?: string;
-  status: 'completed' | 'in-progress' | 'planned';
-  category: 'web' | 'mobile' | 'cli' | 'library';
-}
+import React from 'react';
 
 const statusColors = {
   completed: 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400',
   'in-progress': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400',
-  planned: 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400'
+  planned: 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400',
 };
 
 const categoryIcons = {
   web: '🌐',
   mobile: '📱',
   cli: '⌨️',
-  library: '📚'
+  library: '📚',
 };
 
 const PersonalProjects = () => {
@@ -36,10 +24,7 @@ const PersonalProjects = () => {
         {/* Section Header */}
         <div className="text-center mb-16">
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6">
-            Personal{' '}
-            <span className="text-gradient font-japanese">
-              Projects プロジェクト
-            </span>
+            Personal <span className="text-gradient font-japanese">Projects プロジェクト</span>
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Open-source projects and personal experiments exploring new technologies and ideas
@@ -65,7 +50,9 @@ const PersonalProjects = () => {
                     </div>
                   </div>
                   <Badge
-                    className={`w-28 flex items-center justify-center text-xs px-2 py-1 ${statusColors[project.status]} border-0`}
+                    className={`w-28 flex items-center justify-center text-xs px-2 py-1 ${
+                      statusColors[project.status]
+                    } border-0`}
                   >
                     {project.status.replace('-', ' ')}
                   </Badge>

@@ -1,9 +1,8 @@
-
 import { Button } from '@/components/ui/button';
 import { ExternalLink } from 'lucide-react';
 
 interface ProjectLinkProps {
-  link: string
+  link: string;
 }
 
 export const ProjectLink = ({ link }: ProjectLinkProps) => (
@@ -18,4 +17,4 @@ export const ProjectLink = ({ link }: ProjectLinkProps) => (
       View Project
     </Button>
   </div>
-)
+);

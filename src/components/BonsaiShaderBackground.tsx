@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 
@@ -94,7 +93,7 @@ const BonsaiShaderBackground = ({ className }: BonsaiShaderBackgroundProps) => {
   const scene = useRef<THREE.Scene>();
   const camera = useRef<THREE.Camera>();
   const renderer = useRef<THREE.WebGLRenderer>();
-  const uniforms = useRef<any>();
+  const uniforms = useRef<{ [key: string]: THREE.IUniform }>();
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -106,7 +105,7 @@ const BonsaiShaderBackground = ({ className }: BonsaiShaderBackgroundProps) => {
     // Create renderer
     renderer.current = new THREE.WebGLRenderer({
       alpha: true,
-      antialias: true
+      antialias: true,
     });
     renderer.current.setSize(window.innerWidth, window.innerHeight);
     renderer.current.setClearColor(0x000000, 0);
@@ -118,9 +117,9 @@ const BonsaiShaderBackground = ({ className }: BonsaiShaderBackgroundProps) => {
       resolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
       color: {
         value: document.documentElement.classList.contains('dark')
-          ? new THREE.Vector3(0.8, 0.8, 0.8)  // light gray in dark mode
-          : new THREE.Vector3(0.1, 0.1, 0.1)  // dark gray in light mode
-      }
+          ? new THREE.Vector3(0.8, 0.8, 0.8) // light gray in dark mode
+          : new THREE.Vector3(0.1, 0.1, 0.1), // dark gray in light mode
+      },
     };
 
     // Create shader material
@@ -128,7 +127,7 @@ const BonsaiShaderBackground = ({ className }: BonsaiShaderBackgroundProps) => {
       fragmentShader,
       vertexShader,
       uniforms: uniforms.current,
-      transparent: true
+      transparent: true,
     });
 
     // Create a simple plane to display our shader
@@ -161,19 +160,16 @@ const BonsaiShaderBackground = ({ className }: BonsaiShaderBackgroundProps) => {
 
     // Handle theme change
     const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        if (
-          mutation.attributeName === 'class' &&
-          mutation.target === document.documentElement
-        ) {
+      for (const mutation of mutations) {
+        if (mutation.attributeName === 'class' && mutation.target === document.documentElement) {
           const isDark = document.documentElement.classList.contains('dark');
           if (uniforms.current) {
             uniforms.current.color.value = isDark
-              ? new THREE.Vector3(0.8, 0.8, 0.8)  // light gray in dark mode
-              : new THREE.Vector3(0.1, 0.1, 0.1);  // dark gray in light mode
+              ? new THREE.Vector3(0.8, 0.8, 0.8) // light gray in dark mode
+              : new THREE.Vector3(0.1, 0.1, 0.1); // dark gray in light mode
           }
         }
-      });
+      }
     });
     observer.observe(document.documentElement, { attributes: true });
 
@@ -192,7 +188,9 @@ const BonsaiShaderBackground = ({ className }: BonsaiShaderBackgroundProps) => {
   return (
     <div
       ref={containerRef}
-      className={`absolute inset-0 z-0 opacity-10 dark:opacity-5 overflow-hidden ${className || ''}`}
+      className={`absolute inset-0 z-0 opacity-10 dark:opacity-5 overflow-hidden ${
+        className || ''
+      }`}
       aria-hidden="true"
     />
   );

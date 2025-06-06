@@ -1,12 +1,12 @@
 interface WorkProject {
-  id: string
-  title: string
-  company: string
-  description: string
-  technologies: string[]
-  period: string
-  highlights: string[]
-  link?: string
+  id: string;
+  title: string;
+  company: string;
+  description: string;
+  technologies: string[];
+  period: string;
+  highlights: string[];
+  link?: string;
 }
 
 export const workProjects: WorkProject[] = [
@@ -37,16 +37,8 @@ export const workProjects: WorkProject[] = [
     id: '2',
     title: 'Opentrons AI prototype',
     company: 'Opentrons',
-    description:
-      'Designed frontend architecture and built Opentrons AI prototype frontend',
-    technologies: [
-      'React',
-      'TypeScript',
-      'Jotai',
-      'styled-components',
-      'vite',
-      'vitest',
-    ],
+    description: 'Designed frontend architecture and built Opentrons AI prototype frontend',
+    technologies: ['React', 'TypeScript', 'Jotai', 'styled-components', 'vite', 'vitest'],
     period: '2024 - 2024',
     highlights: ['Design frontend architecture', 'Opentrons first AI app'],
     link: 'https://github.com/Opentrons/opentrons',
@@ -57,14 +49,7 @@ export const workProjects: WorkProject[] = [
     company: 'Ubiquiti Networks',
     description:
       'Developed an IoT hub system that was based on Home Assistant. The system allowed users to control their home devices from a web app.',
-    technologies: [
-      'React',
-      'TypeScript',
-      'Threejs',
-      'Nodejs',
-      'Python',
-      'Home Assistant',
-    ],
+    technologies: ['React', 'TypeScript', 'Threejs', 'Nodejs', 'Python', 'Home Assistant'],
     period: '2028 - 2020',
     highlights: [
       'Allowed users to control IoT devices from a 3D model viewer',
@@ -72,4 +57,4 @@ export const workProjects: WorkProject[] = [
       'iOS object detection prototype app',
     ],
   },
-]
+];
