@@ -13,6 +13,6 @@ export const frontendTechStack = [
   'vite',
   'jest',
   'vitest',
-]
+];
 
-export const otherTechStack = ['Node.js', 'Python', 'Git', 'Docker', 'Figma']
+export const otherTechStack = ['Node.js', 'Python', 'Git', 'Docker', 'Figma'];

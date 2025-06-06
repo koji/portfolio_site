@@ -1,12 +1,12 @@
 interface PersonalProject {
-  id: string
-  title: string
-  description: string
-  technologies: string[]
-  githubUrl?: string
-  liveUrl?: string
-  status: 'completed' | 'in-progress' | 'planned'
-  category: 'web' | 'mobile' | 'cli' | 'library'
+  id: string;
+  title: string;
+  description: string;
+  technologies: string[];
+  githubUrl?: string;
+  liveUrl?: string;
+  status: 'completed' | 'in-progress' | 'planned';
+  category: 'web' | 'mobile' | 'cli' | 'library';
 }
 
 export const personalProjects: PersonalProject[] = [
@@ -62,8 +62,7 @@ export const personalProjects: PersonalProject[] = [
   {
     id: '5',
     title: 'RealSense Scan App',
-    description:
-      'This is an experimental project to use RealSense and openFrameworks.',
+    description: 'This is an experimental project to use RealSense and openFrameworks.',
     technologies: ['Realsense', 'openFrameworks', 'c++'],
     githubUrl: 'https://github.com/koji/RealSense',
     status: 'completed',
@@ -145,8 +144,7 @@ export const personalProjects: PersonalProject[] = [
   {
     id: '14',
     title: 'github label manager',
-    description:
-      'Simple CLI tool to create/delete labels with GitHub Labels API.',
+    description: 'Simple CLI tool to create/delete labels with GitHub Labels API.',
     technologies: ['nodejs', 'typescript'],
     liveUrl:
       'https://levelup.gitconnected.com/create-github-labels-from-terminal-158d4868fabhttps://levelup.gitconnected.com/create-github-labels-from-terminal-158d4868fab', // This seems to be an article, but listed as 'link'
@@ -176,8 +174,7 @@ export const personalProjects: PersonalProject[] = [
   {
     id: '17',
     title: 'next-mint',
-    description:
-      'next-mint allows users to mint an NFT easily without any cost',
+    description: 'next-mint allows users to mint an NFT easily without any cost',
     technologies: ['nextjs', 'typescript', 'NFTPortAPI'],
     liveUrl: 'https://next-mint.vercel.app/',
     githubUrl: 'https://github.com/koji/next-mint',
@@ -188,8 +185,7 @@ export const personalProjects: PersonalProject[] = [
   {
     id: 'oss-0', // Differentiated ID for clarity, can be made sequential if preferred
     title: 'easyGAN',
-    description:
-      'easyGAN is a CLI tool which can train images and generates images with DCGAN.',
+    description: 'easyGAN is a CLI tool which can train images and generates images with DCGAN.',
     technologies: ['python', 'keras'],
     liveUrl: 'https://easygan.netlify.app/',
     status: 'completed',
@@ -262,8 +258,7 @@ export const personalProjects: PersonalProject[] = [
   {
     id: 'oss-7',
     title: 'ichigyou',
-    description:
-      'ichigyo(1行) is a collection of one-liner functions in typescript',
+    description: 'ichigyo(1行) is a collection of one-liner functions in typescript',
     technologies: ['typescript', 'vite', 'vitest'],
     liveUrl: 'https://koji.github.io/ichigyou/index.html',
     githubUrl: 'https://github.com/koji/ichigyou',
@@ -281,4 +276,4 @@ export const personalProjects: PersonalProject[] = [
     status: 'in-progress',
     category: 'library', // ESLint plugin
   },
-]
+];

@@ -1,12 +1,11 @@
-
-import React, { useEffect } from 'react';
-import Navigation from '@/components/Navigation';
-import Hero from '@/components/Hero';
 import About from '@/components/About';
-import { WorkProjects } from '@/components/WorkProjects';
-import PersonalProjects from '@/components/PersonalProjects';
-import Contact from '@/components/Contact';
 import BonsaiShaderBackground from '@/components/BonsaiShaderBackground';
+import Contact from '@/components/Contact';
+import Hero from '@/components/Hero';
+import Navigation from '@/components/Navigation';
+import PersonalProjects from '@/components/PersonalProjects';
+import { WorkProjects } from '@/components/WorkProjects';
+import React, { useEffect } from 'react';
 
 export const Index = () => {
   useEffect(() => {
