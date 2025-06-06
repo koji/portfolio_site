@@ -20,12 +20,7 @@ A modern, responsive portfolio website built with React and TypeScript. This pro
 - **Build Tool**: Vite
 - **Styling**: TailwindCSS
 - **UI Components**: Radix UI, shadcn/ui patterns
-- **3D Rendering**: Three.js
-- **Routing**: React Router
-- **State Management**: React Query
-- **Form Handling**: React Hook Form, Zod
-- **Data Visualization**: Recharts
-- **Animations**: TailwindCSS Animate
+
 
 ## 📦 Installation
 
