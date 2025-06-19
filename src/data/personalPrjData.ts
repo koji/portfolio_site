@@ -285,7 +285,7 @@ export const personalProjects: PersonalProject[] = [
     id: 'web-9',
     title: 'x days shader',
     description:
-      'This is a plugin for ESLint that helps you avoid using margin-related properties in your code.',
+      'A project showcasing daily shader experiments built with React, TypeScript, and TailwindCSS.',
     technologies: ['react', 'typescript', 'vite', 'tailwindcss', 'shader'],
     liveUrl: 'https://x-days-shader.netlify.app/',
     githubUrl: 'https://github.com/koji/x-days-shader',
