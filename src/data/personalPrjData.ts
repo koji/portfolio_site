@@ -234,7 +234,7 @@ export const personalProjects: PersonalProject[] = [
     description:
       'nes-components is a react-component with nes.css. This is published as a npm package.',
     technologies: ['react', 'typescript', 'storybook', 'Netlify'],
-    liveUrl: 'https://nes-components.netlify.com/',
+    liveUrl: 'https://react-nes-components.netlify.app/',
     githubUrl: 'https://github.com/koji/react-nes-components',
     status: 'in-progress',
     category: 'library', // Described as a react-component / npm package
