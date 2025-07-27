@@ -68,8 +68,9 @@ const ThemeToggle = () => {
       size="icon"
       onClick={toggleTheme}
       className="relative h-10 w-10 rounded-full overflow-hidden border border-border/30 backdrop-blur-sm hover:bg-accent/50"
-      aria-label={`Switch to ${theme === 'light' ? 'dark' : theme === 'dark' ? 'system' : 'light'
-        } mode`}
+      aria-label={`Switch to ${
+        theme === 'light' ? 'dark' : theme === 'dark' ? 'system' : 'light'
+      } mode`}
     >
       <div className="absolute inset-0 bg-muted/30 dark:bg-muted/10" />
       <div className="relative z-10 flex items-center justify-center">{getThemeIcon()}</div>
