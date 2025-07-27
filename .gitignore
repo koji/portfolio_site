@@ -22,3 +22,13 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Documentation files to ignore
+.kiro/specs/enhanced-portfolio-shader/design.md
+.kiro/specs/enhanced-portfolio-shader/requirements.md
+.kiro/specs/enhanced-portfolio-shader/tasks.md
+PERFORMANCE_OPTIMIZATION_REPORT.md
+src/components/GoToTopButton.md
+src/utils/ERROR_HANDLING_GUIDE.md
+src/utils/RESPONSIVE_SCALING_GUIDE.md
+src/utils/SHADER_CONFIGURATION_GUIDE.md
