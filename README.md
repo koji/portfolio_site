@@ -39,18 +39,23 @@ pnpm install
 
 ```bash
 # Start development server
+bun run dev
 pnpm dev
 
 # Build for production
+bun run build
 pnpm build
 
 # Build for development
+bun run build:dev
 pnpm build:dev
 
 # Lint code
+bun run lint
 pnpm lint
 
 # Preview production build
+bun run preview
 pnpm preview
 ```
 
@@ -58,6 +63,7 @@ pnpm preview
 
 1. Start the development server:
    ```bash
+   bun run dev
    pnpm dev
    ```
 
@@ -70,6 +76,7 @@ pnpm preview
 Build the project for production:
 
 ```bash
+bun run build
 pnpm build
 ```
 
@@ -81,4 +88,4 @@ The build artifacts will be stored in the `dist/` directory, ready to be deploye
 
 ---
 
-Made with ❤️ by [Your Name]
+Made with ❤️ by koji
