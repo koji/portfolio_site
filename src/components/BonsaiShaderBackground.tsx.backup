@@ -1,0 +1,2489 @@
+import React, { useEffect, useRef } from 'react';
+import * as THREE from 'three';
+import {
+  calculateViewportDimensions,
+  calculateResponsiveShaderSettings,
+  calculateResponsiveShaderSettingsWithTransition,
+  ResponsiveTransitionManager,
+  ResponsiveScaleManager,
+  handleMobileResizeOptimizations,
+  calculateOrientationOptimizations,
+  calculateUltrawideOptimizations,
+  processTouchInteraction,
+  calculateTouchInteractionRadius,
+  interpolateMousePosition,
+  type ViewportDimensions,
+  type ResponsiveShaderSettings,
+  type TouchInteraction,
+  type DeviceCapabilities,
+} from '../utils/shaderUtils';
+import {
+  ShaderErrorHandler,
+  type ShaderError,
+  type FallbackState,
+  type RecoveryOptions,
+} from '../utils/shaderErrorHandling';
+import {
+  getFallbackShader,
+  createCSSFallback,
+  createStaticFallback,
+  type FallbackShaderSet,
+} from '../utils/fallbackShaders';
+
+// Enhanced shader configuration interfaces
+interface EnhancedShaderBackgroundProps {
+  className?: string;
+  intensity?: number; // 0.0 to 1.0, controls overall effect strength
+  interactionEnabled?: boolean; // Enable/disable mouse interactions
+  particleCount?: number; // Number of particles (performance vs quality)
+  animationSpeed?: number; // Speed multiplier for animations
+  respectMotionPreference?: boolean; // Respect prefers-reduced-motion setting
+  disableAnimations?: boolean; // Completely disable animations for accessibility
+  ariaLabel?: string; // Custom ARIA label for screen readers
+}
+
+interface ThemeColors {
+  primary: [number, number, number];
+  accent: [number, number, number];
+  background: [number, number, number];
+  particle: [number, number, number];
+}
+
+interface PerformanceConfig {
+  particleCount: number;
+  animationSpeed: number;
+  interactionEnabled: boolean;
+  renderScale: number;
+}
+
+// Theme color mappings based on portfolio palette
+const THEME_COLORS: { light: ThemeColors; dark: ThemeColors } = {
+  light: {
+    primary: [0.96, 0.4, 0.26], // vermilion-500 normalized
+    accent: [0.91, 0.24, 0.49], // sakura-500 normalized
+    background: [1.0, 1.0, 1.0], // white
+    particle: [0.43, 0.43, 0.43], // sumi-700 normalized
+  },
+  dark: {
+    primary: [1.0, 0.45, 0.3], // vermilion-400 normalized
+    accent: [0.95, 0.46, 0.57], // sakura-400 normalized
+    background: [0.05, 0.05, 0.05], // near black
+    particle: [0.69, 0.69, 0.69], // sumi-300 normalized
+  },
+};
+
+// Performance configurations for different device types
+const PERFORMANCE_CONFIGS: { [key: string]: PerformanceConfig } = {
+  mobile: {
+    particleCount: 50,
+    animationSpeed: 0.7,
+    interactionEnabled: false,
+    renderScale: 0.8,
+  },
+  desktop: {
+    particleCount: 150,
+    animationSpeed: 1.0,
+    interactionEnabled: true,
+    renderScale: 1.0,
+  },
+  highEnd: {
+    particleCount: 300,
+    animationSpeed: 1.2,
+    interactionEnabled: true,
+    renderScale: 1.0,
+  },
+};
+
+// Enhanced fragment shader with multi-layer system
+const fragmentShader = `
+  // Enhanced shader uniforms
+  uniform float time;
+  uniform vec2 resolution;
+  uniform vec2 mouse;
+  uniform float intensity;
+  uniform vec3 primaryColor;
+  uniform vec3 accentColor;
+  uniform vec3 backgroundColor;
+  uniform float particleCount;
+  uniform float flowSpeed;
+  uniform float interactionRadius;
+  uniform float themeTransition; // 0.0 = light theme, 1.0 = dark theme
+  uniform float aspectRatio; // Screen aspect ratio for proper scaling
+
+  // Utility functions
+  vec2 hash(vec2 p) {
+    p = vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)));
+    return -1.0 + 2.0 * fract(sin(p) * 43758.5453123);
+  }
+
+  float noise(in vec2 p) {
+    const float K1 = 0.366025404;
+    const float K2 = 0.211324865;
+    
+    vec2 i = floor(p + (p.x + p.y) * K1);
+    vec2 a = p - i + (i.x + i.y) * K2;
+    vec2 o = step(a.yx, a.xy);
+    vec2 b = a - o + K2;
+    vec2 c = a - 1.0 + 2.0 * K2;
+    
+    vec3 h = max(0.5 - vec3(dot(a, a), dot(b, b), dot(c, c)), 0.0);
+    vec3 n = h * h * h * h * vec3(dot(a, hash(i + 0.0)), dot(b, hash(i + o)), dot(c, hash(i + 1.0)));
+    
+    return dot(n, vec3(70.0));
+  }
+
+  // Enhanced particle system with realistic physics
+  float particleLayer(vec2 uv) {
+    float particles = 0.0;
+    float animTime = time * flowSpeed;
+    
+    // Generate multiple particles with enhanced physics
+    for (float i = 0.0; i < particleCount; i += 1.0) {
+      vec2 seed = vec2(i * 0.137, i * 0.269); // Use prime-like numbers for better distribution
+      
+      // Base particle trajectory with multiple frequency components
+      vec2 basePos = vec2(
+        sin(animTime * 0.2 + i * 0.618) * 0.7 + sin(animTime * 0.5 + i * 1.414) * 0.3,
+        cos(animTime * 0.15 + i * 0.866) * 0.5 + cos(animTime * 0.4 + i * 1.732) * 0.2
+      );
+      
+      // Enhanced Brownian motion with multiple octaves
+      vec2 brownianMotion = vec2(
+        noise(seed + animTime * 0.08) * 0.15 + noise(seed * 2.0 + animTime * 0.12) * 0.08,
+        noise(seed.yx + animTime * 0.1) * 0.12 + noise(seed.yx * 2.0 + animTime * 0.15) * 0.06
+      );
+      
+      // Combine base movement with Brownian motion
+      vec2 pos = basePos + brownianMotion;
+      
+      // Particle lifecycle - spawning and despawning at edges
+      float lifecycle = fract(animTime * 0.1 + i * 0.1);
+      float edgeFade = 1.0;
+      
+      // Fade particles near screen edges for natural spawning/despawning
+      float edgeDistance = min(min(1.0 + pos.x, 1.0 - pos.x), min(1.0 + pos.y, 1.0 - pos.y));
+      edgeFade *= smoothstep(0.0, 0.2, edgeDistance);
+      
+      // Wrap particles that go too far off screen
+      pos.x = pos.x > 1.2 ? -1.2 : (pos.x < -1.2 ? 1.2 : pos.x);
+      pos.y = pos.y > 1.0 ? -1.0 : (pos.y < -1.0 ? 1.0 : pos.y);
+      
+      // Enhanced mouse interaction with sophisticated physics
+      vec2 mousePos = mouse * 2.0 - 1.0;
+      float mouseDistance = length(pos - mousePos);
+      vec2 mouseForce = vec2(0.0);
+      
+      if (mouseDistance < interactionRadius && interactionRadius > 0.0) {
+        vec2 direction = normalize(pos - mousePos);
+        float normalizedDistance = mouseDistance / interactionRadius;
+        
+        // Multi-zone interaction system
+        if (normalizedDistance < 0.3) {
+          // Inner zone: Strong repulsion with exponential falloff
+          float repulsionStrength = pow(1.0 - normalizedDistance / 0.3, 3.0);
+          mouseForce = direction * repulsionStrength * 0.8;
+          
+        } else if (normalizedDistance < 0.7) {
+          // Middle zone: Orbital motion around mouse cursor
+          vec2 tangent = vec2(-direction.y, direction.x); // Perpendicular to radial direction
+          float orbitalStrength = sin((1.0 - normalizedDistance) * 3.14159) * 0.3;
+          
+          // Add some randomness based on particle index for varied orbital directions
+          float orbitalDirection = sin(i * 0.5) > 0.0 ? 1.0 : -1.0;
+          mouseForce = tangent * orbitalStrength * orbitalDirection;
+          
+          // Add slight inward pull to maintain orbit
+          mouseForce += direction * -0.1 * (1.0 - normalizedDistance);
+          
+        } else {
+          // Outer zone: Gentle attraction with smooth falloff
+          float attractionStrength = smoothstep(1.0, 0.7, normalizedDistance) * 0.2;
+          mouseForce = -direction * attractionStrength;
+        }
+        
+        // Add velocity-based damping for more realistic physics
+        float dampingFactor = 0.95;
+        mouseForce *= dampingFactor;
+        
+        // Scale force based on particle depth for layered interaction
+        mouseForce *= mix(0.5, 1.5, depth);
+      }
+      
+      // Apply mouse force with momentum
+      pos += mouseForce;
+      
+      // Add subtle mouse trail effect
+      vec2 mouseTrail = vec2(
+        sin(animTime * 3.0 + mousePos.x * 10.0) * 0.02,
+        cos(animTime * 2.5 + mousePos.y * 8.0) * 0.015
+      );
+      
+      if (mouseDistance < interactionRadius * 1.5) {
+        float trailStrength = smoothstep(interactionRadius * 1.5, interactionRadius * 0.5, mouseDistance);
+        pos += mouseTrail * trailStrength * 0.3;
+      }
+      
+      // Enhanced particle properties with depth simulation
+      float depth = sin(i * 0.314 + animTime * 0.3) * 0.5 + 0.5;
+      float depthVariation = sin(i * 0.159 + animTime * 0.2) * 0.3 + 0.7;
+      
+      // Size varies with depth and has slight pulsing
+      float baseSize = mix(0.001, 0.006, depth);
+      float pulse = sin(animTime * 2.0 + i * 0.5) * 0.0005 + 1.0;
+      float size = baseSize * pulse * depthVariation;
+      
+      // Opacity based on depth, lifecycle, and edge fading
+      float baseOpacity = mix(0.2, 0.9, depth);
+      float lifecycleOpacity = sin(lifecycle * 3.14159); // Fade in and out over lifecycle
+      float opacity = baseOpacity * lifecycleOpacity * edgeFade;
+      
+      // Distance from particle center with soft falloff
+      float dist = length(uv - pos);
+      float particleContribution = opacity * smoothstep(size * 3.0, size * 0.5, dist);
+      
+      // Add subtle glow effect for depth
+      float glow = opacity * 0.3 * smoothstep(size * 6.0, size * 2.0, dist);
+      
+      particles += particleContribution + glow;
+    }
+    
+    return particles;
+  }
+
+  // Enhanced geometric flow layer with sophisticated patterns
+  float geometricLayer(vec2 uv) {
+    float geometry = 0.0;
+    float animTime = time * flowSpeed;
+    
+    // 1. Flowing curved lines with Bezier-like behavior
+    for (float i = 0.0; i < 12.0; i += 1.0) {
+      float angle = i * 0.523599 + animTime * 0.08; // 30 degrees apart for denser pattern
+      vec2 direction = vec2(cos(angle), sin(angle));
+      
+      // Create curved flowing lines using multiple sine waves
+      float curvature = sin(animTime * 0.3 + i * 0.5) * 0.4;
+      vec2 curvedDir = vec2(
+        direction.x + curvature * direction.y,
+        direction.y - curvature * direction.x
+      );
+      
+      float linePos = dot(uv, curvedDir) + sin(animTime * 0.4 + i * 0.7) * 0.5;
+      float line = abs(sin(linePos * 2.0 + animTime * 1.2)) * 0.08;
+      line = smoothstep(0.015, 0.005, line);
+      
+      // Add line thickness variation
+      float thickness = 0.5 + 0.5 * sin(animTime * 0.6 + i * 0.3);
+      geometry += line * 0.25 * thickness;
+    }
+    
+    // 2. Enhanced Voronoi patterns with dynamic morphing
+    vec2 grid = floor(uv * 6.0); // Increased density
+    vec2 gridUv = fract(uv * 6.0);
+    
+    float minDist = 1.0;
+    vec2 closestPoint = vec2(0.0);
+    
+    for (float x = -1.0; x <= 1.0; x += 1.0) {
+      for (float y = -1.0; y <= 1.0; y += 1.0) {
+        vec2 neighbor = vec2(x, y);
+        vec2 point = hash(grid + neighbor);
+        
+        // Dynamic point movement with multiple frequencies
+        point = 0.5 + 0.3 * sin(animTime * 0.2 + 6.2831 * point) + 
+                0.1 * sin(animTime * 0.5 + 12.566 * point.yx);
+        
+        float dist = length(neighbor + point - gridUv);
+        if (dist < minDist) {
+          minDist = dist;
+          closestPoint = neighbor + point;
+        }
+      }
+    }
+    
+    // Create Voronoi cell boundaries with varying thickness
+    float voronoiEdge = smoothstep(0.08, 0.02, minDist - 0.03) * 0.3;
+    
+    // Add pulsing effect to Voronoi cells
+    float pulse = 0.5 + 0.5 * sin(animTime * 2.0 + length(closestPoint) * 10.0);
+    geometry += voronoiEdge * pulse;
+    
+    // 3. Fluid dynamics-inspired mesh deformation
+    vec2 fluidUv = uv * 3.0;
+    float fluidTime = animTime * 0.15;
+    
+    // Create flowing mesh pattern
+    float meshX = sin(fluidUv.x + fluidTime) + sin(fluidUv.x * 2.0 + fluidTime * 1.3) * 0.5;
+    float meshY = cos(fluidUv.y + fluidTime * 0.8) + cos(fluidUv.y * 2.0 + fluidTime * 1.1) * 0.5;
+    
+    // Intersection points create highlights
+    float meshIntersection = smoothstep(0.1, 0.05, abs(meshX)) * smoothstep(0.1, 0.05, abs(meshY));
+    geometry += meshIntersection * 0.4;
+    
+    // 4. Spiral patterns with golden ratio
+    float spiralRadius = length(uv);
+    float spiralAngle = atan(uv.y, uv.x);
+    float goldenAngle = 2.39996; // Golden angle in radians
+    
+    // Create multiple spirals
+    for (float s = 0.0; s < 3.0; s += 1.0) {
+      float spiralPhase = spiralAngle + s * goldenAngle + animTime * 0.3;
+      float spiralPattern = sin(spiralRadius * 8.0 - spiralPhase * 3.0 + animTime);
+      
+      float spiralMask = smoothstep(0.8, 0.2, spiralRadius); // Fade towards edges
+      float spiralLine = smoothstep(0.1, 0.05, abs(spiralPattern)) * spiralMask;
+      
+      geometry += spiralLine * 0.15;
+    }
+    
+    // 5. Hexagonal grid pattern with morphing
+    vec2 hexUv = uv * 4.0;
+    
+    // Convert to hexagonal coordinates
+    float hexX = hexUv.x * 0.866025; // sqrt(3)/2
+    float hexY = hexUv.y - hexUv.x * 0.5;
+    
+    vec2 hexGrid = vec2(floor(hexX + 0.5), floor(hexY + 0.5));
+    vec2 hexLocal = vec2(hexX - hexGrid.x, hexY - hexGrid.y);
+    
+    // Create hexagonal pattern
+    float hexDist = max(abs(hexLocal.x), max(abs(hexLocal.y), abs(hexLocal.x + hexLocal.y)));
+    float hexPattern = smoothstep(0.4, 0.35, hexDist);
+    
+    // Add morphing animation
+    float hexMorph = 0.5 + 0.5 * sin(animTime * 0.4 + length(hexGrid) * 0.5);
+    geometry += hexPattern * 0.2 * hexMorph;
+    
+    // 6. Perlin noise-based organic patterns
+    float organicScale = 8.0;
+    vec2 organicUv = uv * organicScale + animTime * 0.1;
+    
+    // Multi-octave organic pattern
+    float organic = noise(organicUv) * 0.5 + 
+                   noise(organicUv * 2.0) * 0.25 + 
+                   noise(organicUv * 4.0) * 0.125;
+    
+    // Create organic flow lines
+    float organicThreshold = 0.3 + 0.2 * sin(animTime * 0.25);
+    float organicPattern = smoothstep(organicThreshold + 0.05, organicThreshold, organic);
+    geometry += organicPattern * 0.25;
+    
+    return geometry;
+  }
+
+  // Background gradient layer
+  vec3 backgroundLayer(vec2 uv) {
+    // Multi-directional gradient
+    float gradient1 = length(uv - vec2(-0.5, 0.3)) * 0.8;
+    float gradient2 = length(uv - vec2(0.5, -0.3)) * 0.6;
+    
+    // Animated noise overlay
+    float noiseOverlay = noise(uv * 2.0 + time * 0.1) * 0.1 + 0.9;
+    
+    // Mix background colors with gradients
+    vec3 bg = mix(backgroundColor, primaryColor * 0.1, 1.0 - gradient1);
+    bg = mix(bg, accentColor * 0.05, 1.0 - gradient2);
+    
+    return bg * noiseOverlay;
+  }
+
+  void main() {
+    // Normalized pixel coordinates with proper aspect ratio handling
+    vec2 uv = gl_FragCoord.xy / resolution.xy;
+    uv = uv * 2.0 - 1.0;
+    uv.x *= aspectRatio;
+    
+    // Apply responsive scaling adjustments for different screen sizes
+    float scaleFactor = 1.0;
+    if (aspectRatio > 2.0) {
+      // Ultrawide displays - scale down slightly for better visual balance
+      scaleFactor = 0.85;
+    } else if (aspectRatio < 0.75) {
+      // Portrait displays - scale up slightly for better coverage
+      scaleFactor = 1.15;
+    }
+    uv *= scaleFactor;
+    
+    // Generate all layers with depth information
+    vec3 background = backgroundLayer(uv);
+    float particles = particleLayer(uv);
+    float geometry = geometricLayer(uv);
+    
+    // Enhanced color mixing with time-based and theme-responsive variations
+    float colorPhase = sin(time * 0.3) * 0.5 + 0.5;
+    float colorPhase2 = cos(time * 0.2 + 1.57) * 0.5 + 0.5; // 90 degree phase offset
+    
+    // Theme-responsive color intensity adjustments
+    float themeIntensityBoost = mix(1.0, 1.3, themeTransition); // Dark theme gets more intensity
+    float themeContrastBoost = mix(1.0, 1.2, themeTransition); // Dark theme gets more contrast
+    
+    // Dynamic particle colors with theme-responsive mixing
+    vec3 particleColor1 = mix(primaryColor, accentColor, colorPhase) * themeIntensityBoost;
+    vec3 particleColor2 = mix(accentColor, primaryColor * 1.2, colorPhase2) * themeIntensityBoost;
+    vec3 particleColor = mix(particleColor1, particleColor2, sin(time * 0.1) * 0.5 + 0.5);
+    
+    // Theme-responsive particle glow effect
+    float themeGlow = mix(0.8, 1.4, themeTransition); // Stronger glow in dark theme
+    particleColor *= themeGlow;
+    
+    // Dynamic geometry colors with theme-responsive adjustments
+    vec3 geometryColor1 = mix(accentColor * 0.8, primaryColor * 0.9, 1.0 - colorPhase) * themeContrastBoost;
+    vec3 geometryColor2 = mix(primaryColor * 0.7, accentColor * 1.1, 1.0 - colorPhase2) * themeContrastBoost;
+    vec3 geometryColor = mix(geometryColor1, geometryColor2, cos(time * 0.15) * 0.5 + 0.5);
+    
+    // Theme-responsive geometry visibility
+    float themeGeometryBoost = mix(0.7, 1.0, themeTransition); // More visible in dark theme
+    geometryColor *= themeGeometryBoost;
+    
+    // Depth-based layer separation
+    float particleDepth = 0.8; // Particles in foreground
+    float geometryDepth = 0.5;  // Geometry in middle ground
+    float backgroundDepth = 0.2; // Background in back
+    
+    // Advanced blending modes
+    
+    // 1. Screen blending for additive light effects
+    vec3 screenBlend = vec3(1.0) - (vec3(1.0) - background) * (vec3(1.0) - particleColor * particles);
+    
+    // 2. Overlay blending for rich color interaction
+    vec3 overlayBlend = mix(
+      2.0 * background * geometryColor * geometry,
+      vec3(1.0) - 2.0 * (vec3(1.0) - background) * (vec3(1.0) - geometryColor * geometry),
+      step(0.5, background)
+    );
+    
+    // 3. Soft light blending for subtle integration
+    vec3 softLightBlend = mix(
+      background - (vec3(1.0) - 2.0 * particleColor * particles) * background * (vec3(1.0) - background),
+      background + (2.0 * particleColor * particles - vec3(1.0)) * (sqrt(background) - background),
+      step(0.5, particleColor * particles)
+    );
+    
+    // 4. Color dodge for bright highlights
+    vec3 colorDodgeBlend = background / (vec3(1.0) - min(geometryColor * geometry * 0.99, vec3(0.99)));
+    
+    // Layer composition with depth-based mixing
+    vec3 finalColor = background;
+    
+    // Apply geometry layer with overlay blending (middle depth)
+    float geometryStrength = geometry * intensity * 0.7;
+    finalColor = mix(finalColor, overlayBlend, geometryStrength * geometryDepth);
+    
+    // Apply soft highlights with color dodge (selective bright areas)
+    float dodgeStrength = geometry * particles * intensity * 0.3;
+    finalColor = mix(finalColor, colorDodgeBlend, dodgeStrength);
+    
+    // Apply particle layer with screen blending (foreground depth)
+    float particleStrength = particles * intensity * 0.8;
+    finalColor = mix(finalColor, screenBlend, particleStrength * particleDepth);
+    
+    // Add subtle soft light integration
+    float softLightStrength = (particles * geometry) * intensity * 0.4;
+    finalColor = mix(finalColor, softLightBlend, softLightStrength);
+    
+    // Depth-based atmospheric perspective
+    float atmosphericDepth = length(uv) * 0.1; // Slight vignette effect
+    vec3 atmosphericColor = mix(backgroundColor, primaryColor * 0.1, 0.5);
+    finalColor = mix(finalColor, atmosphericColor, atmosphericDepth * intensity * 0.2);
+    
+    // Enhanced alpha composition with depth layering
+    float particleAlpha = particles * particleDepth * intensity;
+    float geometryAlpha = geometry * geometryDepth * intensity * 0.7;
+    float backgroundAlpha = length(background - backgroundColor) * backgroundDepth * 0.3;
+    
+    // Combine alphas with proper depth sorting
+    float totalAlpha = particleAlpha + geometryAlpha * (1.0 - particleAlpha) + 
+                      backgroundAlpha * (1.0 - particleAlpha) * (1.0 - geometryAlpha);
+    
+    // Apply intensity-based opacity modulation
+    totalAlpha *= 0.9; // Slightly more visible than before
+    
+    // Color grading and final adjustments
+    
+    // Subtle color temperature shift based on time
+    float warmth = sin(time * 0.05) * 0.1 + 0.9;
+    finalColor.r *= warmth;
+    finalColor.b *= (2.0 - warmth);
+    
+    // Contrast enhancement
+    finalColor = (finalColor - 0.5) * 1.1 + 0.5;
+    
+    // Saturation boost for more vibrant colors
+    float luminance = dot(finalColor, vec3(0.299, 0.587, 0.114));
+    finalColor = mix(vec3(luminance), finalColor, 1.2);
+    
+    // Ensure colors stay in valid range
+    finalColor = clamp(finalColor, 0.0, 1.0);
+    totalAlpha = clamp(totalAlpha, 0.0, 1.0);
+    
+    gl_FragColor = vec4(finalColor, totalAlpha);
+  }
+`;
+
+// Vertex shader (simple pass-through)
+const vertexShader = `
+  void main() {
+    gl_Position = vec4(position, 1.0);
+  }
+`;
+
+// Device detection utility
+const detectDeviceType = (): keyof typeof PERFORMANCE_CONFIGS => {
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+    navigator.userAgent
+  );
+  const isHighEnd = navigator.hardwareConcurrency >= 8 && window.devicePixelRatio >= 2;
+
+  if (isMobile) return 'mobile';
+  if (isHighEnd) return 'highEnd';
+  return 'desktop';
+};
+
+const EnhancedShaderBackground = ({
+  className,
+  intensity = 0.6,
+  interactionEnabled,
+  particleCount,
+  animationSpeed = 1.0,
+  respectMotionPreference = true,
+  disableAnimations = false,
+  ariaLabel = "Animated background with floating particles and geometric patterns",
+}: EnhancedShaderBackgroundProps) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const animationFrameId = useRef<number>();
+  const scene = useRef<THREE.Scene>();
+  const camera = useRef<THREE.Camera>();
+  const renderer = useRef<THREE.WebGLRenderer>();
+  const uniforms = useRef<{ [key: string]: THREE.IUniform }>();
+  const mousePosition = useRef<THREE.Vector2>(new THREE.Vector2(0.5, 0.5));
+  const smoothMousePosition = useRef<THREE.Vector2>(new THREE.Vector2(0.5, 0.5));
+  const mouseVelocity = useRef<THREE.Vector2>(new THREE.Vector2(0.0, 0.0));
+  const resizeTimeoutId = useRef<number>();
+  const currentDimensions = useRef<{ width: number; height: number }>({ 
+    width: window.innerWidth, 
+    height: window.innerHeight 
+  });
+  const responsiveTransitionManager = useRef<ResponsiveTransitionManager | null>(null);
+  const responsiveScaleManager = useRef<ResponsiveScaleManager | null>(null);
+  const currentResponsiveSettings = useRef<ResponsiveShaderSettings | null>(null);
+  const isResizing = useRef<boolean>(false);
+  const orientationChangeTimeoutId = useRef<number>();
+  
+  // Enhanced error handling system
+  const errorHandler = useRef<ShaderErrorHandler | null>(null);
+  const fallbackElement = useRef<HTMLElement | null>(null);
+  const isUsingFallback = useRef<boolean>(false);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    // Accessibility: Check for motion preferences
+    const prefersReducedMotion = respectMotionPreference && 
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    
+    const shouldDisableAnimations = disableAnimations || prefersReducedMotion;
+    
+    // If animations should be disabled, render a static fallback
+    if (shouldDisableAnimations) {
+      const isDark = document.documentElement.classList.contains('dark');
+      const themeColors = isDark ? THEME_COLORS.dark : THEME_COLORS.light;
+      
+      fallbackElement.current = createStaticFallback(
+        containerRef.current,
+        {
+          primary: `rgb(${themeColors.primary.map(c => Math.round(c * 255)).join(', ')})`,
+          accent: `rgb(${themeColors.accent.map(c => Math.round(c * 255)).join(', ')})`,
+          background: `rgb(${themeColors.background.map(c => Math.round(c * 255)).join(', ')})`,
+        },
+        intensity * 0.3 // Reduced intensity for static version
+      );
+      
+      isUsingFallback.current = true;
+      return;
+    }
+
+    // Initialize enhanced error handling system
+    const recoveryOptions: Partial<RecoveryOptions> = {
+      maxRetries: 3,
+      retryDelay: 1000,
+      fallbackDelay: 2000,
+      enableLogging: process.env.NODE_ENV === 'development',
+      onError: (error: ShaderError) => {
+        console.warn(`Shader error [${error.type}]:`, error.message);
+        
+        // Handle critical errors immediately
+        if (error.severity === 'critical') {
+          handleCriticalError(error);
+        }
+      },
+      onRecovery: (success: boolean) => {
+        if (success) {
+          console.info('Shader system recovered successfully');
+          // Attempt to restore higher quality if possible
+          attemptQualityRestore();
+        }
+      },
+      onFallback: (state: FallbackState) => {
+        console.info(`Applied fallback [${state.level}]:`, state.reason);
+        updateShaderQuality(state);
+      },
+    };
+
+    errorHandler.current = new ShaderErrorHandler(recoveryOptions);
+
+    // Detect device capabilities and get performance config
+    const deviceType = detectDeviceType();
+    const perfConfig = PERFORMANCE_CONFIGS[deviceType];
+
+    // Use prop values or fall back to performance config
+    const finalParticleCount = particleCount ?? perfConfig.particleCount;
+    const finalInteractionEnabled = interactionEnabled ?? perfConfig.interactionEnabled;
+
+    // Check WebGL capabilities before proceeding
+    const capabilities = errorHandler.current.getComponents().capabilityDetector.detectCapabilities();
+    
+    if (!capabilities.supported) {
+      // WebGL not supported - use CSS fallback
+      const isDark = document.documentElement.classList.contains('dark');
+      const themeColors = isDark ? THEME_COLORS.dark : THEME_COLORS.light;
+      
+      fallbackElement.current = createCSSFallback(
+        containerRef.current,
+        {
+          primary: `rgb(${themeColors.primary.map(c => Math.round(c * 255)).join(', ')})`,
+          accent: `rgb(${themeColors.accent.map(c => Math.round(c * 255)).join(', ')})`,
+          background: `rgb(${themeColors.background.map(c => Math.round(c * 255)).join(', ')})`,
+        },
+        intensity
+      );
+      
+      isUsingFallback.current = true;
+      return;
+    }
+
+    // Setup scene
+    scene.current = new THREE.Scene();
+    camera.current = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+
+    // Create renderer with performance optimizations and error handling
+    try {
+      renderer.current = new THREE.WebGLRenderer({
+        alpha: true,
+        antialias: deviceType !== 'mobile',
+        powerPreference: deviceType === 'mobile' ? 'low-power' : 'high-performance',
+      });
+    } catch (error) {
+      errorHandler.current.getComponents().logger.logError(
+        'webgl_unavailable',
+        `WebGL renderer creation failed: ${error}`,
+        'critical'
+      );
+      
+      // Fall back to CSS implementation
+      const isDark = document.documentElement.classList.contains('dark');
+      const themeColors = isDark ? THEME_COLORS.dark : THEME_COLORS.light;
+      
+      fallbackElement.current = createCSSFallback(
+        containerRef.current,
+        {
+          primary: `rgb(${themeColors.primary.map(c => Math.round(c * 255)).join(', ')})`,
+          accent: `rgb(${themeColors.accent.map(c => Math.round(c * 255)).join(', ')})`,
+          background: `rgb(${themeColors.background.map(c => Math.round(c * 255)).join(', ')})`,
+        },
+        intensity
+      );
+      
+      isUsingFallback.current = true;
+      return;
+    }
+
+    const renderWidth = window.innerWidth * perfConfig.renderScale;
+    const renderHeight = window.innerHeight * perfConfig.renderScale;
+
+    renderer.current.setSize(renderWidth, renderHeight);
+    renderer.current.setClearColor(0x000000, 0);
+
+    // Scale canvas to full size if render scale is different
+    if (perfConfig.renderScale !== 1.0) {
+      renderer.current.domElement.style.width = `${window.innerWidth}px`;
+      renderer.current.domElement.style.height = `${window.innerHeight}px`;
+    }
+
+    containerRef.current.appendChild(renderer.current.domElement);
+
+    // Initialize error handling for WebGL context
+    const gl = renderer.current.getContext();
+    if (gl && errorHandler.current) {
+      errorHandler.current.initialize(renderer.current.domElement as HTMLCanvasElement, gl);
+      errorHandler.current.startMonitoring();
+    }
+
+    // Get current theme colors
+    const isDark = document.documentElement.classList.contains('dark');
+    const themeColors = isDark ? THEME_COLORS.dark : THEME_COLORS.light;
+
+    // Create enhanced shader uniforms with responsive scaling support
+    uniforms.current = {
+      time: { value: 0.0 },
+      resolution: { value: new THREE.Vector2(renderWidth, renderHeight) },
+      mouse: { value: mousePosition.current },
+      intensity: { value: intensity },
+      primaryColor: { value: new THREE.Vector3(...themeColors.primary) },
+      accentColor: { value: new THREE.Vector3(...themeColors.accent) },
+      backgroundColor: { value: new THREE.Vector3(...themeColors.background) },
+      particleCount: { value: Math.min(finalParticleCount, 100) }, // Clamp for performance
+      flowSpeed: { value: animationSpeed * perfConfig.animationSpeed },
+      interactionRadius: { value: finalInteractionEnabled ? 0.3 : 0.0 },
+      themeTransition: { value: isDark ? 1.0 : 0.0 },
+      aspectRatio: { value: renderWidth / renderHeight }, // For responsive scaling
+    };
+
+    // Create enhanced shader material with error handling
+    let material: THREE.ShaderMaterial;
+    try {
+      material = new THREE.ShaderMaterial({
+        fragmentShader,
+        vertexShader,
+        uniforms: uniforms.current,
+        transparent: true,
+        blending: THREE.AdditiveBlending, // Enhanced blending for better visual effect
+      });
+    } catch (error) {
+      errorHandler.current?.getComponents().logger.logError(
+        'compilation',
+        `Shader material creation failed: ${error}`,
+        'high'
+      );
+      
+      // Try fallback shader instead of advanced compilation
+      const fallbackShaderSet = getFallbackShader(true, 'medium');
+      
+      try {
+        material = new THREE.ShaderMaterial({
+          fragmentShader: fallbackShaderSet.fragment,
+          vertexShader,
+          uniforms: uniforms.current,
+          transparent: true,
+          blending: THREE.AdditiveBlending,
+        });
+        
+        errorHandler.current?.getComponents().logger.logError(
+          'compilation',
+          'Using fallback shader due to compilation error',
+          'low'
+        );
+      } catch (materialError) {
+        errorHandler.current?.getComponents().logger.logError(
+          'compilation',
+          `Material creation failed even with fallback: ${materialError}`,
+          'critical'
+        );
+        
+        // Complete fallback to CSS
+        const fallbackColors = {
+          primary: `rgb(${themeColors.primary.map(c => Math.round(c * 255)).join(', ')})`,
+          accent: `rgb(${themeColors.accent.map(c => Math.round(c * 255)).join(', ')})`,
+          background: `rgb(${themeColors.background.map(c => Math.round(c * 255)).join(', ')})`,
+        };
+        
+        fallbackElement.current = createCSSFallback(containerRef.current, fallbackColors, intensity);
+        isUsingFallback.current = true;
+        return;
+      }
+    }
+
+    // Create a simple plane to display our shader
+    const geometry = new THREE.PlaneGeometry(2, 2);
+    const mesh = new THREE.Mesh(geometry, material);
+    scene.current.add(mesh);
+
+    // Error handling helper functions
+    const handleCriticalError = (error: ShaderError) => {
+      console.error('Critical shader error detected:', error);
+      
+      // Immediately switch to CSS fallback for critical errors
+      if (containerRef.current && !isUsingFallback.current) {
+        const isDark = document.documentElement.classList.contains('dark');
+        const themeColors = isDark ? THEME_COLORS.dark : THEME_COLORS.light;
+        
+        fallbackElement.current = createCSSFallback(
+          containerRef.current,
+          {
+            primary: `rgb(${themeColors.primary.map(c => Math.round(c * 255)).join(', ')})`,
+            accent: `rgb(${themeColors.accent.map(c => Math.round(c * 255)).join(', ')})`,
+            background: `rgb(${themeColors.background.map(c => Math.round(c * 255)).join(', ')})`,
+          },
+          intensity * 0.5 // Reduced intensity for fallback
+        );
+        
+        isUsingFallback.current = true;
+        
+        // Clean up WebGL resources
+        if (renderer.current) {
+          renderer.current.dispose();
+          renderer.current.domElement.remove();
+        }
+      }
+    };
+
+    const attemptQualityRestore = () => {
+      if (!errorHandler.current) return;
+      
+      const components = errorHandler.current.getComponents();
+      const canRestore = components.degradationManager.canReduceFallback();
+      
+      if (canRestore) {
+        console.info('Attempting to restore shader quality...');
+        
+        // Check if we can move to a better fallback level
+        const currentLevel = components.degradationManager.getCurrentLevel();
+        if (currentLevel === 'minimal') {
+          components.degradationManager.applyFallback('reduced', 'Quality restoration attempt');
+        } else if (currentLevel === 'reduced') {
+          components.degradationManager.applyFallback('none', 'Full quality restoration');
+        }
+        
+        // Update shader configuration
+        updateShaderConfiguration();
+      }
+    };
+
+    const updateShaderQuality = (state: FallbackState) => {
+      if (!errorHandler.current || !uniforms.current) return;
+      
+      const config = errorHandler.current.getComponents().degradationManager.getFallbackConfig();
+      
+      // Update shader uniforms based on fallback configuration
+      if (uniforms.current.particleCount) {
+        uniforms.current.particleCount.value = Math.min(config.particleCount, finalParticleCount);
+      }
+      
+      if (uniforms.current.flowSpeed) {
+        uniforms.current.flowSpeed.value = animationSpeed * config.animationSpeed;
+      }
+      
+      if (uniforms.current.interactionRadius) {
+        uniforms.current.interactionRadius.value = config.interactionEnabled ? 0.3 : 0.0;
+      }
+      
+      if (uniforms.current.intensity) {
+        uniforms.current.intensity.value = intensity * (config.complexEffects ? 1.0 : 0.7);
+      }
+      
+      // Update renderer scale if needed
+      if (renderer.current && config.renderScale !== 1.0) {
+        const newWidth = window.innerWidth * config.renderScale;
+        const newHeight = window.innerHeight * config.renderScale;
+        
+        renderer.current.setSize(newWidth, newHeight);
+        
+        if (config.renderScale !== 1.0) {
+          renderer.current.domElement.style.width = `${window.innerWidth}px`;
+          renderer.current.domElement.style.height = `${window.innerHeight}px`;
+        }
+      }
+    };
+
+    const updateShaderConfiguration = () => {
+      if (!errorHandler.current || !uniforms.current) return;
+      
+      const fallbackState = errorHandler.current.checkAndApplyFallbacks();
+      updateShaderQuality(fallbackState);
+      
+      // Enhanced performance monitoring with predictive adjustments
+      const components = errorHandler.current.getComponents();
+      const currentConfig = components.degradationManager.getFallbackConfig();
+      
+      // Apply predictive memory management
+      const memoryAdjustedConfig = components.recoveryScenarios.handleMemoryPressureWithPrediction(currentConfig);
+      
+      // Apply adaptive performance thresholds
+      const performanceAdjustedConfig = components.recoveryScenarios.handlePerformanceDegradationWithAdaptiveThresholds(
+        memoryAdjustedConfig,
+        30 // Target 30 FPS
+      );
+      
+      // Update uniforms based on adjusted configuration
+      if (uniforms.current.particleCount) {
+        uniforms.current.particleCount.value = performanceAdjustedConfig.particleCount;
+      }
+      if (uniforms.current.flowSpeed) {
+        uniforms.current.flowSpeed.value = performanceAdjustedConfig.animationSpeed;
+      }
+      if (uniforms.current.interactionRadius) {
+        uniforms.current.interactionRadius.value = performanceAdjustedConfig.interactionEnabled ? 0.3 : 0.0;
+      }
+    };
+
+    // Enhanced mouse interaction handler with smooth interpolation
+    const handleMouseMove = (event: MouseEvent) => {
+      if (!finalInteractionEnabled || !containerRef.current) return;
+
+      const rect = containerRef.current.getBoundingClientRect();
+      const x = Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width));
+      const y = Math.max(0, Math.min(1, 1.0 - (event.clientY - rect.top) / rect.height)); // Flip Y coordinate
+
+      // Calculate mouse velocity for enhanced interactions
+      const deltaX = x - mousePosition.current.x;
+      const deltaY = y - mousePosition.current.y;
+      
+      mouseVelocity.current.set(deltaX * 60, deltaY * 60); // Scale by approximate FPS
+      mousePosition.current.set(x, y);
+    };
+
+    // Mouse leave handler to smoothly fade out interactions
+    const handleMouseLeave = () => {
+      if (!finalInteractionEnabled) return;
+      
+      // Gradually move mouse position to center when cursor leaves
+      const centerX = 0.5;
+      const centerY = 0.5;
+      
+      const fadeToCenter = () => {
+        const currentX = mousePosition.current.x;
+        const currentY = mousePosition.current.y;
+        
+        const newX = currentX + (centerX - currentX) * 0.02;
+        const newY = currentY + (centerY - currentY) * 0.02;
+        
+        mousePosition.current.set(newX, newY);
+        
+        // Continue fading if not close enough to center
+        if (Math.abs(newX - centerX) > 0.01 || Math.abs(newY - centerY) > 0.01) {
+          requestAnimationFrame(fadeToCenter);
+        }
+      };
+      
+      fadeToCenter();
+    };
+
+    // Add mouse event listeners if interaction is enabled
+    if (finalInteractionEnabled) {
+      window.addEventListener('mousemove', handleMouseMove);
+      containerRef.current.addEventListener('mouseleave', handleMouseLeave);
+    }
+
+    // Initialize responsive managers
+    if (!responsiveTransitionManager.current) {
+      responsiveTransitionManager.current = new ResponsiveTransitionManager(300);
+    }
+    
+    if (!responsiveScaleManager.current) {
+      const debounceDelay = deviceType === 'mobile' ? 200 : 150;
+      const transitionDuration = deviceType === 'mobile' ? 400 : 300;
+      responsiveScaleManager.current = new ResponsiveScaleManager(debounceDelay, transitionDuration);
+    }
+
+    // Enhanced responsive scaling and window resize handling with smooth transitions
+    const handleWindowResize = () => {
+      if (!renderer.current || !uniforms.current || !containerRef.current) return;
+
+      // Use the responsive scale manager for proper debouncing and transition handling
+      if (responsiveScaleManager.current) {
+        const deviceCapabilities = {
+          tier: deviceType === 'mobile' ? 'low' : deviceType === 'desktop' ? 'high' : 'medium',
+          score: deviceType === 'mobile' ? 0.3 : deviceType === 'desktop' ? 0.8 : 0.6,
+          features: {
+            webgl2: false,
+            floatTextures: false,
+            halfFloatTextures: false,
+            depthTextures: false,
+            instancedArrays: false,
+            vertexArrayObjects: false,
+            maxTextureSize: 2048,
+            maxVertexAttribs: 8,
+            maxFragmentUniforms: 16,
+            isMobile: deviceType === 'mobile',
+            isTablet: deviceType === 'tablet',
+            isDesktop: deviceType === 'desktop',
+            cores: navigator.hardwareConcurrency || 4,
+            deviceMemory: (navigator as any).deviceMemory || 4,
+            pixelRatio: window.devicePixelRatio || 1,
+            refreshRate: 60,
+            renderer: 'unknown',
+            vendor: 'unknown',
+          },
+        } as DeviceCapabilities;
+
+        responsiveScaleManager.current.handleResize((resizeEvent, newSettings) => {
+          // Update current dimensions
+          currentDimensions.current = { 
+            width: resizeEvent.viewport.width, 
+            height: resizeEvent.viewport.height 
+          };
+
+          // Start smooth transition if we have previous settings
+          if (currentResponsiveSettings.current && responsiveTransitionManager.current) {
+            responsiveTransitionManager.current.startTransition(
+              currentResponsiveSettings.current,
+              newSettings
+            );
+          } else {
+            currentResponsiveSettings.current = newSettings;
+          }
+
+          // Apply mobile-specific optimizations if needed
+          if (deviceType === 'mobile') {
+            const mobileOptimizations = handleMobileResizeOptimizations(
+              resizeEvent.viewport,
+              resizeEvent
+            );
+            
+            // Merge mobile optimizations with new settings
+            currentResponsiveSettings.current = {
+              ...newSettings,
+              ...mobileOptimizations,
+            };
+          }
+
+          // Update renderer size with proper scaling
+          const renderWidth = resizeEvent.viewport.width * newSettings.renderScale;
+          const renderHeight = resizeEvent.viewport.height * newSettings.renderScale;
+
+          renderer.current?.setSize(renderWidth, renderHeight);
+          
+          // Update shader uniforms with new viewport settings
+          if (uniforms.current) {
+            uniforms.current.resolution.value.set(renderWidth, renderHeight);
+            uniforms.current.aspectRatio.value = renderWidth / renderHeight;
+            
+            // Apply responsive particle count and interaction settings
+            uniforms.current.particleCount.value = Math.min(newSettings.particleCount, 100);
+            uniforms.current.interactionRadius.value = newSettings.interactionRadius;
+            uniforms.current.flowSpeed.value = newSettings.animationSpeed;
+          }
+
+          // Scale canvas to full size if render scale is different
+          if (newSettings.renderScale !== 1.0 && renderer.current) {
+            renderer.current.domElement.style.width = `${resizeEvent.viewport.width}px`;
+            renderer.current.domElement.style.height = `${resizeEvent.viewport.height}px`;
+          }
+
+          // Reset resize state
+          isResizing.current = false;
+        }, deviceCapabilities);
+      }
+    };
+
+    // Enhanced orientation change handler with smooth transitions
+    const handleOrientationChange = () => {
+      if (orientationChangeTimeoutId.current) {
+        clearTimeout(orientationChangeTimeoutId.current);
+      }
+
+      // Delay handling orientation change to allow for screen rotation completion
+      orientationChangeTimeoutId.current = window.setTimeout(() => {
+        const viewport = calculateViewportDimensions();
+        
+        // Calculate orientation-specific optimizations
+        const orientationSettings = calculateOrientationOptimizations(
+          viewport,
+          currentDimensions.current.width > currentDimensions.current.height ? 'landscape' : 'portrait'
+        );
+
+        // Apply orientation optimizations with smooth transition
+        if (uniforms.current && responsiveTransitionManager.current) {
+          responsiveTransitionManager.current.startTransition(
+            currentResponsiveSettings.current || orientationSettings,
+            orientationSettings
+          );
+          currentResponsiveSettings.current = orientationSettings;
+        }
+
+        // Update dimensions
+        currentDimensions.current = { width: viewport.width, height: viewport.height };
+      }, 500); // Longer delay for orientation changes
+    };
+
+    // Enhanced touch interaction handlers for mobile devices
+    const setupMobileOptimizations = () => {
+      if (viewport.deviceType !== 'mobile' || !finalInteractionEnabled) {
+        return () => {}; // No cleanup needed for non-mobile
+      }
+
+      let lastTouchInteraction: TouchInteraction | undefined;
+      let touchStartTime = 0;
+      let touchVelocityDecay: number | null = null;
+
+      const handleTouchStart = (event: TouchEvent) => {
+        event.preventDefault();
+        touchStartTime = performance.now();
+        
+        if (touchVelocityDecay) {
+          clearTimeout(touchVelocityDecay);
+          touchVelocityDecay = null;
+        }
+
+        if (event.touches.length > 0 && containerRef.current) {
+          const rect = containerRef.current.getBoundingClientRect();
+          const touch = event.touches[0];
+          
+          lastTouchInteraction = processTouchInteraction(touch, rect);
+          
+          // Update mouse position for shader
+          mousePosition.current.set(
+            lastTouchInteraction.position.x,
+            lastTouchInteraction.position.y
+          );
+        }
+      };
+
+      const handleTouchMove = (event: TouchEvent) => {
+        event.preventDefault();
+        
+        if (event.touches.length > 0 && containerRef.current) {
+          const rect = containerRef.current.getBoundingClientRect();
+          const touch = event.touches[0];
+          
+          const newTouchInteraction = processTouchInteraction(touch, rect, lastTouchInteraction);
+          
+          // Calculate touch-specific interaction radius
+          const touchRadius = calculateTouchInteractionRadius(
+            finalInteractionEnabled ? 0.25 : 0.0, // Smaller base radius for mobile
+            newTouchInteraction,
+            viewport.deviceType
+          );
+          
+          // Update shader uniforms
+          if (uniforms.current) {
+            uniforms.current.interactionRadius.value = touchRadius;
+          }
+          
+          // Smooth touch position interpolation
+          const smoothedPosition = interpolateMousePosition(
+            { x: mousePosition.current.x, y: mousePosition.current.y },
+            newTouchInteraction.position,
+            0.3 // Higher lerp factor for more responsive touch
+          );
+          
+          mousePosition.current.set(smoothedPosition.x, smoothedPosition.y);
+          lastTouchInteraction = newTouchInteraction;
+        }
+      };
+
+      const handleTouchEnd = (event: TouchEvent) => {
+        event.preventDefault();
+        
+        // Gradually fade out interaction effect
+        const fadeOutInteraction = () => {
+          if (!uniforms.current) return;
+          
+          const currentRadius = uniforms.current.interactionRadius.value;
+          const newRadius = currentRadius * 0.95;
+          
+          if (newRadius > 0.01) {
+            uniforms.current.interactionRadius.value = newRadius;
+            touchVelocityDecay = window.setTimeout(fadeOutInteraction, 16); // ~60fps
+          } else {
+            uniforms.current.interactionRadius.value = 0;
+            touchVelocityDecay = null;
+          }
+        };
+        
+        // Start fade out after a brief delay
+        touchVelocityDecay = window.setTimeout(fadeOutInteraction, 100);
+        
+        // Reset touch interaction
+        lastTouchInteraction = undefined;
+      };
+
+      // Add touch event listeners
+      if (containerRef.current) {
+        containerRef.current.addEventListener('touchstart', handleTouchStart, { passive: false });
+        containerRef.current.addEventListener('touchmove', handleTouchMove, { passive: false });
+        containerRef.current.addEventListener('touchend', handleTouchEnd, { passive: false });
+      }
+
+      // Cleanup function
+      return () => {
+        if (touchVelocityDecay) {
+          clearTimeout(touchVelocityDecay);
+        }
+        
+        if (containerRef.current) {
+          containerRef.current.removeEventListener('touchstart', handleTouchStart);
+          containerRef.current.removeEventListener('touchmove', handleTouchMove);
+          containerRef.current.removeEventListener('touchend', handleTouchEnd);
+        }
+      };
+    };
+
+    // Add window event listeners
+    window.addEventListener('resize', handleWindowResize);
+    window.addEventListener('orientationchange', handleOrientationChange);
+
+    // Setup mobile optimizations
+    const mobileCleanup = setupMobileOptimizations();
+
+        // Update shader uniforms for new resolution
+        uniforms.current.resolution.value.set(tempRenderWidth, tempRenderHeight);
+        uniforms.current.aspectRatio.value = tempRenderWidth / tempRenderHeight;
+
+        // Apply mobile-specific optimizations during resize
+        if (viewport.deviceType === 'mobile') {
+          const mobileOptimizations = handleMobileResizeOptimizations(viewport, true);
+          
+          // Temporarily reduce particle count during resize for smooth performance
+          uniforms.current.particleCount.value = Math.min(
+            Math.floor(mobileOptimizations.particleCount * 0.8),
+            60
+          );
+          
+          // Reduce animation speed during resize for better performance
+          uniforms.current.flowSpeed.value = mobileOptimizations.animationSpeed * 0.7;
+          
+          // Disable complex effects during mobile resize
+          uniforms.current.intensity.value = intensity * 0.6;
+        }
+
+        // After resize completes, restore full quality
+        const restoreQualityTimeout = window.setTimeout(() => {
+          if (!uniforms.current) return;
+          
+          // Calculate final settings after resize
+          const finalSettings = currentResponsiveSettings.current || newResponsiveSettings;
+          
+          // Restore full quality settings
+          renderer.current.setSize(renderWidth, renderHeight);
+          
+          if (finalSettings.renderScale !== 1.0) {
+            renderer.current.domElement.style.width = `${viewport.width}px`;
+            renderer.current.domElement.style.height = `${viewport.height}px`;
+          } else {
+            renderer.current.domElement.style.width = '';
+            renderer.current.domElement.style.height = '';
+          }
+          
+          // Update uniforms with final settings
+          uniforms.current.resolution.value.set(renderWidth, renderHeight);
+          uniforms.current.aspectRatio.value = renderWidth / renderHeight;
+          uniforms.current.particleCount.value = Math.min(finalSettings.particleCount, 200);
+          uniforms.current.flowSpeed.value = finalSettings.animationSpeed;
+          uniforms.current.interactionRadius.value = finalSettings.interactionRadius;
+          uniforms.current.intensity.value = intensity;
+        }, 300); // Wait for resize to settle
+
+        // Store timeout for cleanup
+        resizeTimeoutId.current = restoreQualityTimeout;
+
+        // Restore full quality after resize animation completes
+        setTimeout(() => {
+          if (!renderer.current || !uniforms.current) return;
+
+          // Get the latest settings (may have been updated by transition)
+          const finalSettings = responsiveTransitionManager.current.isActive() 
+            ? responsiveTransitionManager.current.updateTransition()
+            : newResponsiveSettings;
+
+          if (finalSettings) {
+            currentResponsiveSettings.current = finalSettings;
+            
+            // Restore original render scale and dimensions
+            const finalRenderWidth = viewport.width * finalSettings.renderScale;
+            const finalRenderHeight = viewport.height * finalSettings.renderScale;
+            
+            renderer.current.setSize(finalRenderWidth, finalRenderHeight);
+            
+            if (finalSettings.renderScale !== 1.0) {
+              renderer.current.domElement.style.width = `${viewport.width}px`;
+              renderer.current.domElement.style.height = `${viewport.height}px`;
+            }
+
+            // Restore shader uniforms to full quality
+            uniforms.current.resolution.value.set(finalRenderWidth, finalRenderHeight);
+            uniforms.current.aspectRatio.value = finalRenderWidth / finalRenderHeight;
+            
+            // Restore full settings
+            uniforms.current.particleCount.value = Math.min(finalSettings.particleCount, 200);
+            uniforms.current.flowSpeed.value = finalSettings.animationSpeed;
+            
+            if (finalInteractionEnabled) {
+              uniforms.current.interactionRadius.value = finalSettings.interactionRadius;
+            }
+          }
+        }, newResponsiveSettings.transitionDuration);
+      }, debounceDelay);
+    };
+
+    // Enhanced touch handling for mobile devices
+    const handleTouchStart = (event: TouchEvent) => {
+      if (!finalInteractionEnabled || !containerRef.current || deviceType !== 'mobile') return;
+      
+      event.preventDefault(); // Prevent default touch behaviors
+      
+      const touch = event.touches[0];
+      if (touch) {
+        const rect = containerRef.current.getBoundingClientRect();
+        
+        // Apply responsive scaling to touch coordinates
+        const viewport = calculateViewportDimensions();
+        const scaleX = viewport.width / rect.width;
+        const scaleY = viewport.height / rect.height;
+        
+        const x = Math.max(0, Math.min(1, (touch.clientX - rect.left) / rect.width * scaleX));
+        const y = Math.max(0, Math.min(1, 1.0 - (touch.clientY - rect.top) / rect.height * scaleY));
+        
+        mousePosition.current.set(x, y);
+        
+        // Apply responsive touch interaction radius
+        if (uniforms.current) {
+          const baseRadius = 0.2;
+          const responsiveRadius = baseRadius * Math.min(1.2, viewport.width / 1920); // Scale with screen size
+          uniforms.current.interactionRadius.value = Math.max(0.15, Math.min(0.35, responsiveRadius));
+        }
+      }
+    };
+
+    const handleTouchMove = (event: TouchEvent) => {
+      if (!finalInteractionEnabled || !containerRef.current || deviceType !== 'mobile') return;
+      
+      event.preventDefault();
+      
+      const touch = event.touches[0];
+      if (touch) {
+        const rect = containerRef.current.getBoundingClientRect();
+        const x = Math.max(0, Math.min(1, (touch.clientX - rect.left) / rect.width));
+        const y = Math.max(0, Math.min(1, 1.0 - (touch.clientY - rect.top) / rect.height));
+        
+        // Calculate touch velocity for enhanced mobile interactions
+        const deltaX = x - mousePosition.current.x;
+        const deltaY = y - mousePosition.current.y;
+        mouseVelocity.current.set(deltaX * 30, deltaY * 30); // Lower multiplier for touch
+        
+        mousePosition.current.set(x, y);
+      }
+    };
+
+    const handleTouchEnd = (event: TouchEvent) => {
+      if (!finalInteractionEnabled || deviceType !== 'mobile') return;
+      
+      event.preventDefault();
+      
+      // Gradually fade interaction when touch ends
+      const fadeInteraction = () => {
+        const currentX = mousePosition.current.x;
+        const currentY = mousePosition.current.y;
+        const centerX = 0.5;
+        const centerY = 0.5;
+        
+        const newX = currentX + (centerX - currentX) * 0.05;
+        const newY = currentY + (centerY - currentY) * 0.05;
+        
+        mousePosition.current.set(newX, newY);
+        mouseVelocity.current.multiplyScalar(0.9); // Decay velocity
+        
+        if (Math.abs(newX - centerX) > 0.02 || Math.abs(newY - centerY) > 0.02) {
+          requestAnimationFrame(fadeInteraction);
+        }
+      };
+      
+      fadeInteraction();
+    };
+
+    // Enhanced orientation change handling for mobile devices
+    const handleOrientationChange = () => {
+      // Delay handling to allow for orientation change to complete
+      setTimeout(() => {
+        // Force a resize check regardless of device type
+        handleWindowResize();
+        
+        // Reset interaction state after orientation change
+        mousePosition.current.set(0.5, 0.5);
+        smoothMousePosition.current.set(0.5, 0.5);
+        mouseVelocity.current.set(0, 0);
+        
+        // Additional mobile-specific handling
+        if (deviceType === 'mobile') {
+          // Recalculate mobile optimizations for new orientation
+          const viewport = calculateViewportDimensions();
+          const deviceCapabilities = {
+            tier: 'low' as const,
+            score: 0.3,
+            features: {
+              isMobile: true,
+              isTablet: false,
+              isDesktop: false,
+              cores: navigator.hardwareConcurrency || 2,
+              deviceMemory: (navigator as any).deviceMemory || 2,
+              pixelRatio: window.devicePixelRatio || 1,
+            } as any,
+          };
+          
+          const mobileOptimizations = calculateMobileOptimizations(viewport, deviceCapabilities);
+          
+          // Apply orientation-specific optimizations
+          if (uniforms.current) {
+            // Temporarily reduce effects during orientation transition
+            uniforms.current.intensity.value = intensity * 0.7;
+            
+            // Restore full intensity after transition
+            setTimeout(() => {
+              if (uniforms.current) {
+                uniforms.current.intensity.value = intensity;
+              }
+            }, 500);
+          }
+        }
+      }, 150); // Longer delay for orientation changes
+    };
+
+    // Add event listeners for responsive behavior
+    window.addEventListener('resize', handleWindowResize);
+    window.addEventListener('orientationchange', handleOrientationChange);
+    
+    // Add touch event listeners for mobile devices
+    if (deviceType === 'mobile' && finalInteractionEnabled) {
+      containerRef.current.addEventListener('touchstart', handleTouchStart, { passive: false });
+      containerRef.current.addEventListener('touchmove', handleTouchMove, { passive: false });
+      containerRef.current.addEventListener('touchend', handleTouchEnd, { passive: false });
+    }
+
+    // Enhanced performance monitoring system with comprehensive metrics
+    const performanceMetrics = useRef({
+      frameCount: 0,
+      lastTime: performance.now(),
+      fps: 60,
+      averageFps: 60,
+      fpsHistory: [] as number[],
+      frameTime: 16.67, // Target 60fps
+      averageFrameTime: 16.67,
+      frameTimeHistory: [] as number[],
+      qualityLevel: 1.0, // 0.0 to 1.0
+      adaptiveQualityEnabled: true,
+      performanceScore: 1.0, // Overall performance score
+      lastQualityAdjustment: 0,
+      gpuTier: 'unknown' as 'low' | 'medium' | 'high' | 'unknown',
+      memoryUsage: 0,
+      renderTime: 0,
+      cpuUsage: 0,
+      thermalState: 'normal' as 'normal' | 'fair' | 'serious' | 'critical',
+      batteryLevel: 1.0,
+      isLowPowerMode: false,
+      networkSpeed: 'fast' as 'slow' | 'medium' | 'fast',
+      qualityAdjustments: 0,
+      stabilityScore: 1.0,
+      adaptiveSettings: {
+        particleCountMultiplier: 1.0,
+        animationSpeedMultiplier: 1.0,
+        interactionRadiusMultiplier: 1.0,
+        renderScaleMultiplier: 1.0,
+        effectIntensityMultiplier: 1.0,
+      },
+    });
+
+    // Comprehensive device capability detection with advanced metrics
+    const detectDeviceCapabilities = () => {
+      const canvas = document.createElement('canvas');
+      const gl = canvas.getContext('webgl2') || canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+      
+      if (!gl) return { tier: 'low', score: 0.1, features: {} };
+      
+      // WebGL capabilities
+      const maxTextureSize = gl.getParameter(gl.MAX_TEXTURE_SIZE);
+      const maxVertexAttribs = gl.getParameter(gl.MAX_VERTEX_ATTRIBS);
+      const maxFragmentUniforms = gl.getParameter(gl.MAX_FRAGMENT_UNIFORM_VECTORS);
+      const maxVaryingVectors = gl.getParameter(gl.MAX_VARYING_VECTORS);
+      
+      // GPU detection with more comprehensive analysis
+      const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+      const renderer = debugInfo ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) : '';
+      const vendor = debugInfo ? gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL) : '';
+      
+      // Device memory detection
+      const deviceMemory = (navigator as any).deviceMemory || 4;
+      
+      // Hardware concurrency
+      const cores = navigator.hardwareConcurrency || 4;
+      
+      // Screen metrics
+      const screenArea = window.screen.width * window.screen.height;
+      const pixelRatio = window.devicePixelRatio || 1;
+      const refreshRate = (window.screen as any).refreshRate || 60;
+      
+      // Battery and power state detection
+      const battery = (navigator as any).getBattery?.();
+      const connection = (navigator as any).connection || (navigator as any).mozConnection || (navigator as any).webkitConnection;
+      
+      // Platform detection
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      const isTablet = /iPad|Android(?!.*Mobile)/i.test(navigator.userAgent);
+      const isDesktop = !isMobile && !isTablet;
+      
+      // Calculate comprehensive performance score
+      let score = 0.3; // Base score
+      
+      // GPU tier detection with more granular scoring
+      const rendererLower = renderer.toLowerCase();
+      const vendorLower = vendor.toLowerCase();
+      
+      if (rendererLower.includes('nvidia')) {
+        if (rendererLower.includes('rtx') || rendererLower.includes('gtx 1')) score += 0.4;
+        else if (rendererLower.includes('gtx')) score += 0.3;
+        else score += 0.2;
+      } else if (rendererLower.includes('amd') || rendererLower.includes('radeon')) {
+        if (rendererLower.includes('rx') || rendererLower.includes('vega')) score += 0.3;
+        else score += 0.2;
+      } else if (rendererLower.includes('intel')) {
+        if (rendererLower.includes('iris') || rendererLower.includes('xe')) score += 0.15;
+        else score += 0.05;
+      } else if (rendererLower.includes('apple') || rendererLower.includes('m1') || rendererLower.includes('m2')) {
+        score += 0.25; // Apple Silicon
+      }
+      
+      // Memory scoring
+      score += Math.min(deviceMemory / 32, 0.15); // Up to 0.15 for 32GB+
+      
+      // CPU scoring
+      score += Math.min(cores / 20, 0.15); // Up to 0.15 for 20+ cores
+      
+      // WebGL capability scoring
+      score += Math.min(maxTextureSize / 16384, 0.1); // Up to 0.1 for 16K textures
+      score += Math.min(maxFragmentUniforms / 1024, 0.05); // Fragment uniform support
+      
+      // Platform adjustments
+      if (isMobile) score *= 0.6; // Mobile penalty
+      else if (isTablet) score *= 0.8; // Tablet penalty
+      
+      // Screen complexity penalty
+      const screenComplexity = (screenArea * pixelRatio) / (1920 * 1080);
+      score -= Math.max(0, (screenComplexity - 1) * 0.08);
+      
+      // High refresh rate bonus
+      if (refreshRate > 60) score += 0.05;
+      
+      // Determine tier with more granular classification
+      let tier: 'low' | 'medium' | 'high';
+      if (score < 0.35) tier = 'low';
+      else if (score < 0.65) tier = 'medium';
+      else tier = 'high';
+      
+      // Feature detection
+      const features = {
+        webgl2: !!gl.getParameter,
+        floatTextures: !!gl.getExtension('OES_texture_float'),
+        halfFloatTextures: !!gl.getExtension('OES_texture_half_float'),
+        depthTextures: !!gl.getExtension('WEBGL_depth_texture'),
+        instancedArrays: !!gl.getExtension('ANGLE_instanced_arrays'),
+        vertexArrayObjects: !!gl.getExtension('OES_vertex_array_object'),
+        maxTextureSize,
+        maxVertexAttribs,
+        maxFragmentUniforms,
+        isMobile,
+        isTablet,
+        isDesktop,
+        cores,
+        deviceMemory,
+        pixelRatio,
+        refreshRate,
+        renderer,
+        vendor,
+      };
+      
+      return { 
+        tier, 
+        score: Math.max(0.1, Math.min(1.0, score)),
+        features
+      };
+    };
+
+    const deviceCapabilities = detectDeviceCapabilities();
+    performanceMetrics.current.gpuTier = deviceCapabilities.tier;
+    performanceMetrics.current.performanceScore = deviceCapabilities.score;
+
+    // Initialize adaptive settings based on device capabilities
+    const initializeAdaptiveSettings = () => {
+      const metrics = performanceMetrics.current;
+      const { tier, score, features } = deviceCapabilities;
+      
+      // Base settings multipliers based on device tier
+      switch (tier) {
+        case 'low':
+          metrics.adaptiveSettings = {
+            particleCountMultiplier: 0.4,
+            animationSpeedMultiplier: 0.7,
+            interactionRadiusMultiplier: 0.8,
+            renderScaleMultiplier: 0.6,
+            effectIntensityMultiplier: 0.8,
+          };
+          break;
+        case 'medium':
+          metrics.adaptiveSettings = {
+            particleCountMultiplier: 0.7,
+            animationSpeedMultiplier: 0.9,
+            interactionRadiusMultiplier: 0.9,
+            renderScaleMultiplier: 0.8,
+            effectIntensityMultiplier: 0.9,
+          };
+          break;
+        case 'high':
+          metrics.adaptiveSettings = {
+            particleCountMultiplier: 1.2,
+            animationSpeedMultiplier: 1.1,
+            interactionRadiusMultiplier: 1.1,
+            renderScaleMultiplier: 1.0,
+            effectIntensityMultiplier: 1.1,
+          };
+          break;
+      }
+      
+      // Fine-tune based on specific features
+      if (features.isMobile) {
+        Object.keys(metrics.adaptiveSettings).forEach(key => {
+          metrics.adaptiveSettings[key as keyof typeof metrics.adaptiveSettings] *= 0.8;
+        });
+      }
+      
+      if (features.pixelRatio > 2) {
+        metrics.adaptiveSettings.renderScaleMultiplier *= 0.8;
+      }
+      
+      if (features.cores < 4) {
+        metrics.adaptiveSettings.animationSpeedMultiplier *= 0.9;
+      }
+    };
+
+    initializeAdaptiveSettings();
+
+    // Advanced adaptive quality adjustment with multiple strategies
+    const adjustQuality = (targetFps: number = 50) => {
+      const metrics = performanceMetrics.current;
+      const currentTime = performance.now();
+      
+      // Don't adjust too frequently (every 3 seconds minimum)
+      if (currentTime - metrics.lastQualityAdjustment < 3000) return;
+      
+      const fpsRatio = metrics.averageFps / targetFps;
+      const shouldReduce = fpsRatio < 0.9 && metrics.qualityLevel > 0.2;
+      const shouldIncrease = fpsRatio > 1.1 && metrics.qualityLevel < 1.0 && metrics.qualityAdjustments > 0;
+      
+      if (shouldReduce) {
+        // Progressive quality reduction strategy
+        metrics.qualityLevel *= 0.85;
+        metrics.qualityAdjustments++;
+        metrics.lastQualityAdjustment = currentTime;
+        
+        if (uniforms.current) {
+          // Strategy 1: Reduce particle count (most effective)
+          if (metrics.qualityAdjustments <= 2) {
+            uniforms.current.particleCount.value = Math.max(
+              15, 
+              uniforms.current.particleCount.value * 0.8
+            );
+          }
+          
+          // Strategy 2: Reduce animation speed (moderate impact)
+          else if (metrics.qualityAdjustments <= 4) {
+            uniforms.current.flowSpeed.value = Math.max(
+              0.3,
+              uniforms.current.flowSpeed.value * 0.9
+            );
+          }
+          
+          // Strategy 3: Reduce interaction radius (minimal impact)
+          else if (metrics.qualityAdjustments <= 6) {
+            uniforms.current.interactionRadius.value = Math.max(
+              0.1,
+              uniforms.current.interactionRadius.value * 0.9
+            );
+          }
+          
+          // Strategy 4: Reduce overall intensity (last resort)
+          else {
+            uniforms.current.intensity.value = Math.max(
+              0.3,
+              uniforms.current.intensity.value * 0.95
+            );
+          }
+        }
+        
+        console.log(`Performance: Reduced quality to ${(metrics.qualityLevel * 100).toFixed(1)}% (FPS: ${metrics.averageFps.toFixed(1)})`);
+        
+      } else if (shouldIncrease) {
+        // Progressive quality increase (recovery)
+        metrics.qualityLevel = Math.min(1.0, metrics.qualityLevel * 1.1);
+        metrics.qualityAdjustments = Math.max(0, metrics.qualityAdjustments - 1);
+        metrics.lastQualityAdjustment = currentTime;
+        
+        if (uniforms.current) {
+          // Reverse the reduction strategies
+          if (metrics.qualityAdjustments >= 6) {
+            uniforms.current.intensity.value = Math.min(
+              intensity,
+              uniforms.current.intensity.value * 1.05
+            );
+          } else if (metrics.qualityAdjustments >= 4) {
+            uniforms.current.interactionRadius.value = Math.min(
+              finalInteractionEnabled ? 0.3 : 0.0,
+              uniforms.current.interactionRadius.value * 1.1
+            );
+          } else if (metrics.qualityAdjustments >= 2) {
+            uniforms.current.flowSpeed.value = Math.min(
+              animationSpeed * perfConfig.animationSpeed,
+              uniforms.current.flowSpeed.value * 1.1
+            );
+          } else {
+            uniforms.current.particleCount.value = Math.min(
+              Math.min(finalParticleCount, 100),
+              uniforms.current.particleCount.value * 1.2
+            );
+          }
+        }
+        
+        console.log(`Performance: Increased quality to ${(metrics.qualityLevel * 100).toFixed(1)}% (FPS: ${metrics.averageFps.toFixed(1)})`);
+      }
+    };
+
+    // Thermal throttling detection and response
+    const handleThermalThrottling = () => {
+      const metrics = performanceMetrics.current;
+      
+      // Detect thermal throttling through performance degradation patterns
+      if (metrics.fpsHistory.length >= 10) {
+        const recentFps = metrics.fpsHistory.slice(-10);
+        const oldFps = metrics.fpsHistory.slice(-20, -10);
+        
+        if (recentFps.length === 10 && oldFps.length === 10) {
+          const recentAvg = recentFps.reduce((a, b) => a + b) / 10;
+          const oldAvg = oldFps.reduce((a, b) => a + b) / 10;
+          
+          // Significant performance drop indicates thermal throttling
+          if (recentAvg < oldAvg * 0.8 && recentAvg < 45) {
+            metrics.thermalState = 'serious';
+            
+            // Aggressive quality reduction for thermal management
+            if (uniforms.current) {
+              uniforms.current.particleCount.value = Math.max(10, uniforms.current.particleCount.value * 0.5);
+              uniforms.current.flowSpeed.value = Math.max(0.2, uniforms.current.flowSpeed.value * 0.7);
+              uniforms.current.intensity.value = Math.max(0.2, uniforms.current.intensity.value * 0.8);
+            }
+            
+            console.warn('Thermal throttling detected - reducing shader complexity');
+          }
+        }
+      }
+    };
+
+    // Enhanced animation loop with comprehensive performance monitoring
+    const animate = () => {
+      const currentTime = performance.now();
+      const metrics = performanceMetrics.current;
+      
+      // Record frame for error handler performance monitoring
+      errorHandler.current?.recordFrame();
+      
+      metrics.frameCount++;
+      const frameTime = currentTime - metrics.lastTime;
+      
+      // Update frame time history
+      metrics.frameTimeHistory.push(frameTime);
+      if (metrics.frameTimeHistory.length > 60) {
+        metrics.frameTimeHistory.shift();
+      }
+      
+      // Calculate average frame time
+      metrics.averageFrameTime = metrics.frameTimeHistory.reduce((a, b) => a + b, 0) / metrics.frameTimeHistory.length;
+      
+      // Calculate FPS every second
+      if (frameTime >= 1000) {
+        metrics.fps = metrics.frameCount;
+        metrics.frameCount = 0;
+        metrics.lastTime = currentTime;
+        
+        // Update FPS history
+        metrics.fpsHistory.push(metrics.fps);
+        if (metrics.fpsHistory.length > 10) {
+          metrics.fpsHistory.shift();
+        }
+        
+        // Calculate average FPS
+        metrics.averageFps = metrics.fpsHistory.reduce((a, b) => a + b, 0) / metrics.fpsHistory.length;
+        
+        // Adaptive quality adjustment
+        if (metrics.adaptiveQualityEnabled) {
+          adjustQuality();
+        }
+        
+        // Performance logging (only in development)
+        if (process.env.NODE_ENV === 'development') {
+          console.log(`Shader Performance: ${metrics.fps}fps (avg: ${metrics.averageFps.toFixed(1)}), Quality: ${(metrics.qualityLevel * 100).toFixed(1)}%`);
+        }
+      }
+      
+      // Memory usage monitoring (if available)
+      if ((performance as any).memory) {
+        const memory = (performance as any).memory;
+        if (memory.usedJSHeapSize > memory.jsHeapSizeLimit * 0.9) {
+          console.warn('High memory usage detected, reducing shader quality');
+          adjustQuality(30); // More aggressive quality reduction
+        }
+      }
+
+      if (uniforms.current) {
+        // Update time
+        uniforms.current.time.value += 0.016 * uniforms.current.flowSpeed.value; // ~60fps timing
+        
+        // Smooth theme color transitions
+        interpolateThemeColors();
+        
+        // Update responsive transitions if active
+        if (responsiveTransitionManager.current && responsiveTransitionManager.current.isActive()) {
+          const transitionSettings = responsiveTransitionManager.current.updateTransition();
+          if (transitionSettings) {
+            currentResponsiveSettings.current = transitionSettings;
+            
+            // Apply transitioning settings to uniforms
+            uniforms.current.particleCount.value = Math.min(transitionSettings.particleCount, 200);
+            uniforms.current.flowSpeed.value = transitionSettings.animationSpeed;
+            
+            if (finalInteractionEnabled) {
+              uniforms.current.interactionRadius.value = transitionSettings.interactionRadius;
+            }
+          }
+        }
+        
+        // Smooth mouse position interpolation for fluid interactions
+        if (finalInteractionEnabled) {
+          const lerpFactor = 0.1; // Adjust for smoother/snappier response
+          
+          smoothMousePosition.current.x += (mousePosition.current.x - smoothMousePosition.current.x) * lerpFactor;
+          smoothMousePosition.current.y += (mousePosition.current.y - smoothMousePosition.current.y) * lerpFactor;
+          
+          // Update shader uniform with smoothed position
+          uniforms.current.mouse.value = smoothMousePosition.current;
+          
+          // Adjust interaction radius based on mouse velocity for dynamic responsiveness
+          const velocityMagnitude = Math.sqrt(
+            mouseVelocity.current.x * mouseVelocity.current.x + 
+            mouseVelocity.current.y * mouseVelocity.current.y
+          );
+          
+          // Use current responsive settings for base radius if available
+          const baseRadius = currentResponsiveSettings.current 
+            ? currentResponsiveSettings.current.interactionRadius 
+            : (finalInteractionEnabled ? 0.3 : 0.0);
+          const velocityBoost = Math.min(velocityMagnitude * 0.1, 0.2); // Cap the boost
+          uniforms.current.interactionRadius.value = baseRadius + velocityBoost;
+          
+          // Decay mouse velocity
+          mouseVelocity.current.multiplyScalar(0.95);
+        }
+      }
+
+      if (renderer.current && scene.current && camera.current) {
+        try {
+          // Check for WebGL context loss before rendering
+          if (renderer.current.getContext().isContextLost()) {
+            errorHandler.current?.getComponents().logger.logError(
+              'context_loss',
+              'WebGL context lost during render',
+              'high'
+            );
+            return; // Skip this frame
+          }
+          
+          renderer.current.render(scene.current, camera.current);
+          
+          // Periodic error checking with enhanced pattern analysis (every 60 frames)
+          if (metrics.frameCount % 60 === 0) {
+            const cascadingCheck = errorHandler.current?.checkCascadingFailures();
+            if (cascadingCheck?.shouldDisable) {
+              errorHandler.current?.getComponents().logger.logError(
+                'performance',
+                `Cascading failure detected: ${cascadingCheck.reason} (pattern: ${cascadingCheck.pattern}, confidence: ${cascadingCheck.confidence?.toFixed(2)})`,
+                'critical'
+              );
+              
+              handleCriticalError({
+                type: 'performance',
+                message: cascadingCheck.reason,
+                timestamp: Date.now(),
+                severity: 'critical',
+                recoverable: false,
+                context: {
+                  pattern: cascadingCheck.pattern,
+                  confidence: cascadingCheck.confidence,
+                },
+              });
+              return;
+            }
+            
+            // Check and apply fallbacks based on current performance
+            updateShaderConfiguration();
+          }
+          
+        } catch (error) {
+          errorHandler.current?.getComponents().logger.logError(
+            'performance',
+            `Render error: ${error}`,
+            'medium',
+            { error, frameCount: metrics.frameCount }
+          );
+          
+          // Check for cascading failures with enhanced pattern analysis
+          const cascadingCheck = errorHandler.current?.checkCascadingFailures();
+          if (cascadingCheck?.shouldDisable) {
+            handleCriticalError({
+              type: 'performance',
+              message: `Render failure: ${cascadingCheck.reason}`,
+              timestamp: Date.now(),
+              severity: 'critical',
+              recoverable: false,
+              context: {
+                pattern: cascadingCheck.pattern,
+                confidence: cascadingCheck.confidence,
+                renderError: true,
+              },
+            });
+            return;
+          }
+        }
+      }
+
+      animationFrameId.current = requestAnimationFrame(animate);
+    };
+    animate();
+
+    // Enhanced responsive scaling and window resize handler with smooth transitions
+    const resizeTransition = useRef({
+      isResizing: false,
+      resizeTimeout: null as NodeJS.Timeout | null,
+      lastWidth: window.innerWidth,
+      lastHeight: window.innerHeight,
+      targetWidth: window.innerWidth,
+      targetHeight: window.innerHeight,
+      transitionProgress: 1.0,
+      transitionSpeed: 0.15,
+    });
+
+    const smoothResizeTransition = () => {
+      const transition = resizeTransition.current;
+      
+      if (transition.transitionProgress >= 1.0) {
+        transition.isResizing = false;
+        return;
+      }
+
+      // Smooth easing function for resize transitions
+      const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
+      transition.transitionProgress = Math.min(1.0, transition.transitionProgress + transition.transitionSpeed);
+      const easedProgress = easeOutCubic(transition.transitionProgress);
+
+      // Interpolate dimensions
+      const currentWidth = transition.lastWidth + (transition.targetWidth - transition.lastWidth) * easedProgress;
+      const currentHeight = transition.lastHeight + (transition.targetHeight - transition.lastHeight) * easedProgress;
+
+      // Apply smooth scaling
+      if (renderer.current && uniforms.current) {
+        const scaledWidth = currentWidth * perfConfig.renderScale;
+        const scaledHeight = currentHeight * perfConfig.renderScale;
+
+        renderer.current.setSize(scaledWidth, scaledHeight);
+        uniforms.current.resolution.value.set(scaledWidth, scaledHeight);
+
+        // Update canvas display size with smooth scaling
+        if (perfConfig.renderScale !== 1.0) {
+          renderer.current.domElement.style.width = `${currentWidth}px`;
+          renderer.current.domElement.style.height = `${currentHeight}px`;
+        }
+
+        // Update aspect ratio-dependent shader parameters
+        const aspectRatio = currentWidth / currentHeight;
+        if (uniforms.current.aspectRatio) {
+          uniforms.current.aspectRatio.value = aspectRatio;
+        }
+
+        // Adjust particle density based on screen area for consistent visual density
+        const screenArea = currentWidth * currentHeight;
+        const baseArea = 1920 * 1080; // Reference resolution
+        const areaRatio = Math.sqrt(screenArea / baseArea);
+        const adjustedParticleCount = Math.max(
+          Math.min(finalParticleCount, 100) * 0.5, // Minimum 50% of particles
+          Math.min(finalParticleCount, 100) * areaRatio
+        );
+        
+        if (uniforms.current.particleCount) {
+          uniforms.current.particleCount.value = Math.floor(adjustedParticleCount);
+        }
+
+        // Adjust interaction radius for different screen sizes
+        const baseInteractionRadius = finalInteractionEnabled ? 0.3 : 0.0;
+        const screenSizeMultiplier = Math.min(1.5, Math.max(0.7, areaRatio));
+        if (uniforms.current.interactionRadius) {
+          uniforms.current.interactionRadius.value = baseInteractionRadius * screenSizeMultiplier;
+        }
+      }
+
+      if (transition.isResizing) {
+        requestAnimationFrame(smoothResizeTransition);
+      }
+    };
+
+    const handleResize = () => {
+      const transition = resizeTransition.current;
+      
+      // Clear existing resize timeout
+      if (transition.resizeTimeout) {
+        clearTimeout(transition.resizeTimeout);
+      }
+
+      // Start smooth transition
+      if (!transition.isResizing) {
+        transition.lastWidth = transition.targetWidth;
+        transition.lastHeight = transition.targetHeight;
+        transition.transitionProgress = 0.0;
+        transition.isResizing = true;
+        requestAnimationFrame(smoothResizeTransition);
+      }
+
+      // Update target dimensions
+      transition.targetWidth = window.innerWidth;
+      transition.targetHeight = window.innerHeight;
+
+      // Debounce resize completion for performance optimization
+      transition.resizeTimeout = setTimeout(() => {
+        // Final resize adjustment after transition completes
+        if (renderer.current && uniforms.current) {
+          const finalWidth = window.innerWidth * perfConfig.renderScale;
+          const finalHeight = window.innerHeight * perfConfig.renderScale;
+
+          renderer.current.setSize(finalWidth, finalHeight);
+          uniforms.current.resolution.value.set(finalWidth, finalHeight);
+
+          if (perfConfig.renderScale !== 1.0) {
+            renderer.current.domElement.style.width = `${window.innerWidth}px`;
+            renderer.current.domElement.style.height = `${window.innerHeight}px`;
+          }
+
+          // Trigger performance re-evaluation after resize
+          if (performanceMetrics.current.adaptiveQualityEnabled) {
+            performanceMetrics.current.qualityAdjustments = Math.max(0, performanceMetrics.current.qualityAdjustments - 1);
+          }
+        }
+        
+        transition.isResizing = false;
+        transition.transitionProgress = 1.0;
+      }, 150); // 150ms debounce
+    };
+
+    // Enhanced mobile-specific optimizations for touch devices
+    const setupMobileOptimizations = () => {
+      if (deviceType === 'mobile') {
+        // Optimize for mobile touch interactions
+        if (containerRef.current) {
+          // Prevent default touch behaviors that might interfere
+          containerRef.current.style.touchAction = 'none';
+          containerRef.current.style.userSelect = 'none';
+          containerRef.current.style.webkitUserSelect = 'none';
+          
+          // Add mobile-specific CSS optimizations
+          containerRef.current.style.willChange = 'transform';
+          containerRef.current.style.backfaceVisibility = 'hidden';
+          containerRef.current.style.perspective = '1000px';
+        }
+
+        // Mobile touch interaction handlers
+        const handleTouchStart = (event: TouchEvent) => {
+          if (!finalInteractionEnabled || !containerRef.current) return;
+          
+          event.preventDefault();
+          const touch = event.touches[0];
+          const rect = containerRef.current.getBoundingClientRect();
+          
+          const x = Math.max(0, Math.min(1, (touch.clientX - rect.left) / rect.width));
+          const y = Math.max(0, Math.min(1, 1.0 - (touch.clientY - rect.top) / rect.height));
+          
+          mousePosition.current.set(x, y);
+        };
+
+        const handleTouchMove = (event: TouchEvent) => {
+          if (!finalInteractionEnabled || !containerRef.current) return;
+          
+          event.preventDefault();
+          const touch = event.touches[0];
+          const rect = containerRef.current.getBoundingClientRect();
+          
+          const x = Math.max(0, Math.min(1, (touch.clientX - rect.left) / rect.width));
+          const y = Math.max(0, Math.min(1, 1.0 - (touch.clientY - rect.top) / rect.height));
+          
+          // Calculate touch velocity for mobile interactions
+          const deltaX = x - mousePosition.current.x;
+          const deltaY = y - mousePosition.current.y;
+          mouseVelocity.current.set(deltaX * 30, deltaY * 30); // Scale for touch sensitivity
+          
+          mousePosition.current.set(x, y);
+        };
+
+        const handleTouchEnd = (event: TouchEvent) => {
+          if (!finalInteractionEnabled) return;
+          
+          event.preventDefault();
+          // Gradually fade interaction when touch ends
+          const fadeOut = () => {
+            const currentRadius = uniforms.current?.interactionRadius.value || 0;
+            if (currentRadius > 0.01) {
+              if (uniforms.current) {
+                uniforms.current.interactionRadius.value = currentRadius * 0.95;
+              }
+              requestAnimationFrame(fadeOut);
+            }
+          };
+          fadeOut();
+        };
+
+        // Add touch event listeners for mobile
+        if (containerRef.current) {
+          containerRef.current.addEventListener('touchstart', handleTouchStart, { passive: false });
+          containerRef.current.addEventListener('touchmove', handleTouchMove, { passive: false });
+          containerRef.current.addEventListener('touchend', handleTouchEnd, { passive: false });
+        }
+
+        // Mobile-specific performance optimizations
+        if (uniforms.current) {
+          // Reduce complexity for mobile devices
+          uniforms.current.flowSpeed.value *= 0.8; // Slower animations for battery life
+          
+          // Adjust interaction sensitivity for touch
+          const baseMobileRadius = finalInteractionEnabled ? 0.4 : 0.0; // Larger touch area
+          uniforms.current.interactionRadius.value = baseMobileRadius;
+        }
+
+        // Enhanced mobile touch interaction handling with responsive scaling
+        let currentTouchInteraction: TouchInteraction | null = null;
+        let touchInteractionRadius = calculateTouchInteractionRadius(calculateViewportDimensions());
+
+        const handleTouchStart = (event: TouchEvent) => {
+          if (!finalInteractionEnabled || !containerRef.current) return;
+          
+          event.preventDefault();
+          const touch = event.touches[0];
+          const rect = containerRef.current.getBoundingClientRect();
+          const viewport = calculateViewportDimensions();
+          
+          currentTouchInteraction = processTouchInteraction(touch, rect, viewport);
+          
+          // Update mouse position for shader (touch acts as mouse)
+          mousePosition.current.set(
+            currentTouchInteraction.position.x,
+            currentTouchInteraction.position.y
+          );
+          
+          // Update interaction radius based on touch properties
+          touchInteractionRadius = calculateTouchInteractionRadius(viewport, 0.3);
+          if (uniforms.current) {
+            uniforms.current.interactionRadius.value = touchInteractionRadius;
+          }
+        };
+
+        const handleTouchMove = (event: TouchEvent) => {
+          if (!finalInteractionEnabled || !containerRef.current || !currentTouchInteraction) return;
+          
+          event.preventDefault();
+          const touch = event.touches[0];
+          const rect = containerRef.current.getBoundingClientRect();
+          const viewport = calculateViewportDimensions();
+          
+          const newTouchInteraction = processTouchInteraction(touch, rect, viewport);
+          
+          // Calculate touch velocity for enhanced interactions
+          const deltaTime = newTouchInteraction.timestamp - currentTouchInteraction.timestamp;
+          if (deltaTime > 0) {
+            const velocity = {
+              x: (newTouchInteraction.position.x - currentTouchInteraction.position.x) / deltaTime * 1000,
+              y: (newTouchInteraction.position.y - currentTouchInteraction.position.y) / deltaTime * 1000,
+            };
+            
+            // Adjust interaction radius based on touch velocity
+            const velocityMagnitude = Math.sqrt(velocity.x * velocity.x + velocity.y * velocity.y);
+            touchInteractionRadius = calculateTouchInteractionRadius(viewport, 0.3 + velocityMagnitude * 0.1);
+            
+            if (uniforms.current) {
+              uniforms.current.interactionRadius.value = touchInteractionRadius;
+            }
+          }
+          
+          currentTouchInteraction = newTouchInteraction;
+          
+          // Update mouse position with smooth interpolation for touch
+          const lerpFactor = 0.3; // Faster interpolation for touch
+          const interpolatedPos = interpolateMousePosition(
+            { x: mousePosition.current.x, y: mousePosition.current.y },
+            currentTouchInteraction.position,
+            lerpFactor
+          );
+          
+          mousePosition.current.set(interpolatedPos.x, interpolatedPos.y);
+        };
+
+        const handleTouchEnd = (event: TouchEvent) => {
+          if (!finalInteractionEnabled) return;
+          
+          event.preventDefault();
+          currentTouchInteraction = null;
+          
+          // Gradually fade out interaction radius
+          const fadeOutInteraction = () => {
+            if (uniforms.current && uniforms.current.interactionRadius.value > 0) {
+              uniforms.current.interactionRadius.value *= 0.95;
+              if (uniforms.current.interactionRadius.value > 0.01) {
+                requestAnimationFrame(fadeOutInteraction);
+              } else {
+                uniforms.current.interactionRadius.value = 0;
+              }
+            }
+          };
+          
+          fadeOutInteraction();
+          
+          // Gradually move touch position to center
+          const fadeToCenter = () => {
+            const centerX = 0.5;
+            const centerY = 0.5;
+            const currentX = mousePosition.current.x;
+            const currentY = mousePosition.current.y;
+            
+            const newX = currentX + (centerX - currentX) * 0.02;
+            const newY = currentY + (centerY - currentY) * 0.02;
+            
+            mousePosition.current.set(newX, newY);
+            
+            if (Math.abs(newX - centerX) > 0.01 || Math.abs(newY - centerY) > 0.01) {
+              requestAnimationFrame(fadeToCenter);
+            }
+          };
+          
+          fadeToCenter();
+        };
+
+        // Add touch event listeners
+        if (containerRef.current) {
+          containerRef.current.addEventListener('touchstart', handleTouchStart, { passive: false });
+          containerRef.current.addEventListener('touchmove', handleTouchMove, { passive: false });
+          containerRef.current.addEventListener('touchend', handleTouchEnd, { passive: false });
+        }
+
+        // Enhanced mobile viewport and orientation handling
+        const handleOrientationChange = () => {
+          // Clear any existing orientation timeout
+          if (orientationChangeTimeoutId.current) {
+            clearTimeout(orientationChangeTimeoutId.current);
+          }
+          
+          // Set longer delay for orientation changes to ensure viewport stabilizes
+          orientationChangeTimeoutId.current = window.setTimeout(() => {
+            if (!uniforms.current || !renderer.current) return;
+            
+            const viewport = calculateViewportDimensions();
+            const previousOrientation = currentDimensions.current.width > currentDimensions.current.height ? 'landscape' : 'portrait';
+            
+            // Calculate orientation-specific optimizations
+            const orientationSettings = calculateOrientationOptimizations(viewport, previousOrientation);
+            
+            // Apply immediate orientation optimizations
+            uniforms.current.particleCount.value = Math.min(orientationSettings.particleCount, 100);
+            uniforms.current.interactionRadius.value = orientationSettings.interactionRadius;
+            
+            // Update current settings
+            currentResponsiveSettings.current = orientationSettings;
+            
+            // Update touch interaction radius for new orientation
+            touchInteractionRadius = calculateTouchInteractionRadius(viewport);
+            
+            // Trigger full resize handling after orientation settles
+            setTimeout(() => {
+              handleWindowResize();
+            }, 50);
+          }, 150); // Longer delay for orientation changes
+        };
+
+        window.addEventListener('orientationchange', handleOrientationChange);
+        
+        return () => {
+          if (containerRef.current) {
+            containerRef.current.removeEventListener('touchstart', handleTouchStart);
+            containerRef.current.removeEventListener('touchmove', handleTouchMove);
+            containerRef.current.removeEventListener('touchend', handleTouchEnd);
+          }
+          window.removeEventListener('orientationchange', handleOrientationChange);
+        };
+      }
+      
+      return () => {}; // No cleanup needed for non-mobile
+    };
+
+    const mobileCleanup = setupMobileOptimizations();
+    window.addEventListener('resize', handleResize);
+
+    // Enhanced theme change handler with smooth animated transitions
+    const currentThemeColors = useRef({
+      primary: isDark ? THEME_COLORS.dark.primary : THEME_COLORS.light.primary,
+      accent: isDark ? THEME_COLORS.dark.accent : THEME_COLORS.light.accent,
+      background: isDark ? THEME_COLORS.dark.background : THEME_COLORS.light.background,
+    });
+    
+    const targetThemeColors = useRef({ ...currentThemeColors.current });
+    const themeTransitionProgress = useRef(1.0); // 1.0 = transition complete
+    const themeTransitionSpeed = 0.05; // Adjust for faster/slower transitions
+
+    const updateThemeColors = (isDark: boolean) => {
+      if (!uniforms.current) return;
+
+      const newThemeColors = isDark ? THEME_COLORS.dark : THEME_COLORS.light;
+      
+      // Set new target colors
+      targetThemeColors.current = {
+        primary: [...newThemeColors.primary],
+        accent: [...newThemeColors.accent],
+        background: [...newThemeColors.background],
+      };
+      
+      // Start transition
+      themeTransitionProgress.current = 0.0;
+    };
+
+    // Smooth theme color interpolation function
+    const interpolateThemeColors = () => {
+      if (themeTransitionProgress.current >= 1.0) return;
+      
+      themeTransitionProgress.current = Math.min(1.0, themeTransitionProgress.current + themeTransitionSpeed);
+      
+      // Smooth easing function (ease-out)
+      const easeOut = (t: number) => 1 - Math.pow(1 - t, 3);
+      const easedProgress = easeOut(themeTransitionProgress.current);
+      
+      // Interpolate each color component
+      const interpolateColor = (current: number[], target: number[]) => [
+        current[0] + (target[0] - current[0]) * easedProgress,
+        current[1] + (target[1] - current[1]) * easedProgress,
+        current[2] + (target[2] - current[2]) * easedProgress,
+      ];
+      
+      currentThemeColors.current = {
+        primary: interpolateColor(currentThemeColors.current.primary, targetThemeColors.current.primary),
+        accent: interpolateColor(currentThemeColors.current.accent, targetThemeColors.current.accent),
+        background: interpolateColor(currentThemeColors.current.background, targetThemeColors.current.background),
+      };
+      
+      // Update shader uniforms with interpolated colors
+      if (uniforms.current) {
+        uniforms.current.primaryColor.value.set(...currentThemeColors.current.primary);
+        uniforms.current.accentColor.value.set(...currentThemeColors.current.accent);
+        uniforms.current.backgroundColor.value.set(...currentThemeColors.current.background);
+        uniforms.current.themeTransition.value = easedProgress;
+      }
+    };
+
+    const observer = new MutationObserver((mutations) => {
+      for (const mutation of mutations) {
+        if (mutation.attributeName === 'class' && mutation.target === document.documentElement) {
+          const isDark = document.documentElement.classList.contains('dark');
+          updateThemeColors(isDark);
+        }
+      }
+    });
+    observer.observe(document.documentElement, { attributes: true });
+
+    // Accessibility: Monitor motion preference changes
+    const motionMediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const handleMotionPreferenceChange = (e: MediaQueryListEvent) => {
+      if (!respectMotionPreference) return;
+      
+      const shouldReduceMotion = e.matches;
+      
+      if (shouldReduceMotion && uniforms.current) {
+        // Reduce animation intensity and speed when motion is reduced
+        uniforms.current.flowSpeed.value = animationSpeed * 0.2; // Very slow animations
+        uniforms.current.intensity.value = intensity * 0.3; // Reduced visual intensity
+        uniforms.current.particleCount.value = Math.min(uniforms.current.particleCount.value, 20); // Fewer particles
+        uniforms.current.interactionRadius.value = 0; // Disable interactions
+      } else if (!shouldReduceMotion && uniforms.current && !disableAnimations) {
+        // Restore normal animation settings
+        const deviceType = detectDeviceType();
+        const perfConfig = PERFORMANCE_CONFIGS[deviceType];
+        const finalParticleCount = particleCount ?? perfConfig.particleCount;
+        const finalInteractionEnabled = interactionEnabled ?? perfConfig.interactionEnabled;
+        
+        uniforms.current.flowSpeed.value = animationSpeed * perfConfig.animationSpeed;
+        uniforms.current.intensity.value = intensity;
+        uniforms.current.particleCount.value = Math.min(finalParticleCount, 100);
+        uniforms.current.interactionRadius.value = finalInteractionEnabled ? 0.3 : 0.0;
+      }
+    };
+    
+    motionMediaQuery.addEventListener('change', handleMotionPreferenceChange);
+
+    return () => {
+      // Clear resize timeout
+      if (resizeTimeoutId.current) {
+        clearTimeout(resizeTimeoutId.current);
+      }
+      
+      // Remove window event listeners
+      window.removeEventListener('resize', handleWindowResize);
+      window.removeEventListener('orientationchange', handleOrientationChange);
+      
+      // Remove mouse event listeners
+      if (finalInteractionEnabled) {
+        window.removeEventListener('mousemove', handleMouseMove);
+        if (containerRef.current) {
+          containerRef.current.removeEventListener('mouseleave', handleMouseLeave);
+        }
+      }
+      
+      // Remove touch event listeners for mobile
+      if (deviceType === 'mobile' && finalInteractionEnabled && containerRef.current) {
+        containerRef.current.removeEventListener('touchstart', handleTouchStart);
+        containerRef.current.removeEventListener('touchmove', handleTouchMove);
+        containerRef.current.removeEventListener('touchend', handleTouchEnd);
+      }
+      
+      // Cancel animation frame
+      if (animationFrameId.current) {
+        cancelAnimationFrame(animationFrameId.current);
+      }
+      
+      // Clean up error handler
+      if (errorHandler.current) {
+        errorHandler.current.cleanup();
+        errorHandler.current = null;
+      }
+      
+      // Clean up fallback element
+      if (fallbackElement.current && containerRef.current) {
+        containerRef.current.removeChild(fallbackElement.current);
+        fallbackElement.current = null;
+      }
+      
+      // Clean up renderer
+      if (containerRef.current && renderer.current) {
+        containerRef.current.removeChild(renderer.current.domElement);
+        renderer.current.dispose();
+      }
+      
+      // Disconnect theme observer
+      observer.disconnect();
+      
+      // Remove motion preference listener
+      motionMediaQuery.removeEventListener('change', handleMotionPreferenceChange);
+    };
+  }, [intensity, interactionEnabled, particleCount, animationSpeed, respectMotionPreference, disableAnimations]);
+
+  return (
+    <div
+      ref={containerRef}
+      className={`absolute inset-0 z-0 overflow-hidden ${className || ''}`}
+      style={{
+        opacity: intensity * 0.8, // Use intensity prop for opacity control
+        mixBlendMode: 'screen', // Enhanced blending with page content
+      }}
+      aria-hidden="true"
+      aria-label={ariaLabel}
+      role="img"
+      data-testid="enhanced-shader-background"
+      data-motion-preference={respectMotionPreference ? 'respect' : 'ignore'}
+      data-animations-disabled={disableAnimations}
+    />
+  );
+};
+
+// Export with both names for backward compatibility
+export default EnhancedShaderBackground;
+export { EnhancedShaderBackground as BonsaiShaderBackground };

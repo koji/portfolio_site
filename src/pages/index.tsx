@@ -1,6 +1,7 @@
 import About from '@/components/About';
 import BonsaiShaderBackground from '@/components/BonsaiShaderBackground';
 import Contact from '@/components/Contact';
+import GoToTopButton from '@/components/GoToTopButton';
 import Hero from '@/components/Hero';
 import Navigation from '@/components/Navigation';
 import PersonalProjects from '@/components/PersonalProjects';
@@ -34,6 +35,14 @@ export const Index = () => {
           <Contact />
         </main>
       </div>
+
+      {/* Go to Top Button - Positioned on the right for better accessibility */}
+      <GoToTopButton 
+        position="bottom-right"
+        showAfter={150}
+        showScrollProgress={true}
+        className="debug-go-to-top"
+      />
     </div>
   );
 };
