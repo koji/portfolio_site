@@ -24,7 +24,7 @@ A modern, responsive portfolio website built with React and TypeScript. This pro
 
 ## 📦 Installation
 
-Make sure you have [Node.js](https://nodejs.org/) and [pnpm](https://pnpm.io/) installed.
+Make sure you have [Node.js](https://nodejs.org/), [bun](https://bun.com/), and [pnpm](https://pnpm.io/) installed.
 
 ```bash
 # Clone the repository
