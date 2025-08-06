@@ -287,4 +287,15 @@ export const personalProjects: PersonalProject[] = [
     status: 'in-progress',
     category: 'web',
   },
+    {
+    id: 'web-10',
+    title: 'Veo3 JSON Creator',
+    description:
+      'JSON generator for Veo3',
+    technologies: ['python', 'streamlit', 'huggingface', 'github actions', 'Cerebras API'],
+    liveUrl: 'https://huggingface.co/spaces/baxin/veo3-json-creator',
+    githubUrl: '',
+    status: 'in-progress',
+    category: 'web',
+  },
 ];
