@@ -298,4 +298,15 @@ export const personalProjects: PersonalProject[] = [
     status: 'in-progress',
     category: 'web',
   },
+    {
+    id: 'oss-9',
+    title: 'hyouji',
+    description:
+      'Simple CLI tool to create/delete labels with GitHub Labels API',
+    technologies: ['github', 'typescript', 'vite', 'cli', 'vibe-coding'],
+    liveUrl: 'https://www.npmjs.com/package/hyouji',
+    githubUrl: 'https://github.com/koji/Hyouji',
+    status: 'in-progress',
+    category: 'library',
+  },
 ];
