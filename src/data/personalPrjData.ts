@@ -143,19 +143,6 @@ export const personalProjects: PersonalProject[] = [
     category: "web",
   },
   {
-    id: "14",
-    title: "github label manager",
-    description:
-      "Simple CLI tool to create/delete labels with GitHub Labels API.",
-    technologies: ["nodejs", "typescript"],
-    liveUrl:
-      "https://levelup.gitconnected.com/create-github-labels-from-terminal-158d4868fabhttps://levelup.gitconnected.com/create-github-labels-from-terminal-158d4868fab", // This seems to be an article, but listed as 'link'
-    githubUrl:
-      "https://github.com/koji/github-label-managerhttps://github.com/koji/github-label-manager",
-    status: "completed",
-    category: "cli", // Described as CLI tool
-  },
-  {
     id: "15",
     title: "complexity with colors",
     description: "This is an experimental project to try an NFT on opensea.io",
