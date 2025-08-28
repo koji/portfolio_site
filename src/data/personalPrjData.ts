@@ -5,308 +5,305 @@ interface PersonalProject {
   technologies: string[];
   githubUrl?: string;
   liveUrl?: string;
-  status: 'completed' | 'in-progress' | 'planned';
-  category: 'web' | 'mobile' | 'cli' | 'library';
+  status: "completed" | "in-progress" | "planned";
+  category: "web" | "mobile" | "cli" | "library";
 }
 
 export const personalProjects: PersonalProject[] = [
   {
-    id: '0',
-    title: 'mtindo',
+    id: "0",
+    title: "mtindo",
     description:
-      'mtindo is a style transfer application. It offers a unique opportunity that generates a new image/video from an image/video.',
-    technologies: ['python', 'nodejs', 'electron'],
-    liveUrl: 'https://itp.nyu.edu/thesis2018/#/student/koji',
-    status: 'completed',
-    category: 'web', // Electron apps are often categorized with web technologies
+      "mtindo is a style transfer application. It offers a unique opportunity that generates a new image/video from an image/video.",
+    technologies: ["python", "nodejs", "electron"],
+    liveUrl: "https://itp.nyu.edu/thesis2018/#/student/koji",
+    status: "completed",
+    category: "web", // Electron apps are often categorized with web technologies
   },
   {
-    id: '1',
-    title: 'Data from Mukuru',
+    id: "1",
+    title: "Data from Mukuru",
     description:
-      'Data Visualization project with Pawa Initiative which is a NPO in Nairobi, Kenya.',
-    technologies: ['js', 'D3js', 'heroku'],
-    liveUrl: 'https://datavi.herokuapp.com/mukuru/',
-    status: 'completed',
-    category: 'web',
+      "Data Visualization project with Pawa Initiative which is a NPO in Nairobi, Kenya.",
+    technologies: ["js", "D3js", "heroku"],
+    liveUrl: "https://datavi.herokuapp.com/mukuru/",
+    status: "completed",
+    category: "web",
   },
   {
-    id: '2',
-    title: 'nikobot',
+    id: "2",
+    title: "nikobot",
     description:
-      'nikobot is an interactive expressive robot pet for your desk, a minimal interactive robot.',
-    technologies: ['Arduino', 'html', 'css', 'js'],
-    liveUrl: 'https://www.nitishitp.com/nikobot',
-    status: 'completed',
-    category: 'web', // Due to html, css, js for interaction
+      "nikobot is an interactive expressive robot pet for your desk, a minimal interactive robot.",
+    technologies: ["Arduino", "html", "css", "js"],
+    liveUrl: "https://www.nitishitp.com/nikobot",
+    status: "completed",
+    category: "web", // Due to html, css, js for interaction
   },
   {
-    id: '3',
-    title: 'Rose light',
+    id: "3",
+    title: "Rose light",
     description:
-      'Rose light is a physical computing project that is made of 3d printing parts and Arduino. The color is controlled by a smartphone via Bluetooth',
-    technologies: ['Arduino', '3D printer', 'Bluetooth'],
-    status: 'completed',
-    category: 'web', // Categorized as web due to smartphone control potentially via a web-like interface or for broader categorization; could also be 'mobile' if a dedicated app is implied.
+      "Rose light is a physical computing project that is made of 3d printing parts and Arduino. The color is controlled by a smartphone via Bluetooth",
+    technologies: ["Arduino", "3D printer", "Bluetooth"],
+    status: "completed",
+    category: "web", // Categorized as web due to smartphone control potentially via a web-like interface or for broader categorization; could also be 'mobile' if a dedicated app is implied.
   },
   {
-    id: '4',
-    title: 'Gif Camera',
+    id: "4",
+    title: "Gif Camera",
     description:
-      'Gif Camera is a physical computing prototype. This device offers a function that can create a gif easily to users. This offers 5 types of filters with combinations of three buttons.',
-    technologies: ['Raspberry Pi Zero', 'python', 'ffmpeg'],
-    githubUrl: 'https://github.com/koji/gifCamera',
-    status: 'completed',
-    category: 'cli', // Python and ffmpeg suggest a tool/utility, potentially CLI-driven
+      "Gif Camera is a physical computing prototype. This device offers a function that can create a gif easily to users. This offers 5 types of filters with combinations of three buttons.",
+    technologies: ["Raspberry Pi Zero", "python", "ffmpeg"],
+    githubUrl: "https://github.com/koji/gifCamera",
+    status: "completed",
+    category: "cli", // Python and ffmpeg suggest a tool/utility, potentially CLI-driven
   },
   {
-    id: '5',
-    title: 'RealSense Scan App',
-    description: 'This is an experimental project to use RealSense and openFrameworks.',
-    technologies: ['Realsense', 'openFrameworks', 'c++'],
-    githubUrl: 'https://github.com/koji/RealSense',
-    status: 'completed',
-    category: 'web', // openFrameworks projects often are visual applications, showcased online.
+    id: "5",
+    title: "RealSense Scan App",
+    description:
+      "This is an experimental project to use RealSense and openFrameworks.",
+    technologies: ["Realsense", "openFrameworks", "c++"],
+    githubUrl: "https://github.com/koji/RealSense",
+    status: "completed",
+    category: "web", // openFrameworks projects often are visual applications, showcased online.
   },
   {
-    id: '6',
-    title: 'Ichi-go ichi-e',
+    id: "6",
+    title: "Ichi-go ichi-e",
     description: `Ichi-go ichi-e is a Japanese four-character idiom.
             The term means "for this time only" or "once in a lifetime."
             Ichi-go ichi-e is an openFrameworks application that generates a new shader code.`,
-    technologies: ['openFrameworks', 'python'],
-    liveUrl: 'https://vimeo.com/363803650',
-    status: 'completed',
-    category: 'web', // Visual application showcased online.
+    technologies: ["openFrameworks", "python"],
+    liveUrl: "https://vimeo.com/363803650",
+    status: "completed",
+    category: "web", // Visual application showcased online.
   },
   {
-    id: '7',
-    title: 'Jobs on GitHub',
+    id: "7",
+    title: "Jobs on GitHub",
     description:
-      'Use GitHub API for Job boards with Reactjs and Typescript. The main purpose is to use react hooks.',
-    technologies: ['React', 'TypeScript', 'GitHub API', 'Netlify'],
-    liveUrl: 'https://engineer-job-board.netlify.app/',
-    githubUrl: 'https://github.com/koji/Jobs-on-GitHub',
-    status: 'completed',
-    category: 'web',
+      "Use GitHub API for Job boards with Reactjs and Typescript. The main purpose is to use react hooks.",
+    technologies: ["React", "TypeScript", "GitHub API", "Netlify"],
+    liveUrl: "https://engineer-job-board.netlify.app/",
+    githubUrl: "https://github.com/koji/Jobs-on-GitHub",
+    status: "completed",
+    category: "web",
   },
   {
-    id: '8',
-    title: 'Movie Search App',
+    id: "8",
+    title: "Movie Search App",
     description:
-      'Use OMDB API with Reactjs and Typescript. Currently the website has a search function.',
-    technologies: ['React', 'TypeScript', 'OMDB API', 'Netlify'],
-    liveUrl: 'https://react-movie-list-app.netlify.app/',
-    githubUrl: 'https://github.com/koji/movieApp',
-    status: 'completed',
-    category: 'web',
+      "Use OMDB API with Reactjs and Typescript. Currently the website has a search function.",
+    technologies: ["React", "TypeScript", "OMDB API", "Netlify"],
+    liveUrl: "https://react-movie-list-app.netlify.app/",
+    githubUrl: "https://github.com/koji/movieApp",
+    status: "completed",
+    category: "web",
   },
   {
-    id: '10',
-    title: 'NewsAPI News',
-    description: 'nextjs demo app with News API (SSG)',
-    technologies: ['Nextjs', 'TypeScript', 'News API', 'Vercel'],
-    liveUrl: 'https://nextjs-with-newsapi.vercel.app/',
-    githubUrl: 'https://github.com/koji/nextjs_with_newsapi',
-    status: 'completed',
-    category: 'web',
+    id: "10",
+    title: "NewsAPI News",
+    description: "nextjs demo app with News API (SSG)",
+    technologies: ["Nextjs", "TypeScript", "News API", "Vercel"],
+    liveUrl: "https://nextjs-with-newsapi.vercel.app/",
+    githubUrl: "https://github.com/koji/nextjs_with_newsapi",
+    status: "completed",
+    category: "web",
   },
   {
-    id: '11',
-    title: 'Math art',
-    description: 'Generative art that is generated by Julia Sets.',
-    technologies: ['Processing', 'Netlify'],
-    liveUrl: 'https://math-art.netlify.app/',
-    status: 'completed',
-    category: 'web', // Hosted on Netlify
+    id: "11",
+    title: "Math art",
+    description: "Generative art that is generated by Julia Sets.",
+    technologies: ["Processing", "Netlify"],
+    liveUrl: "https://math-art.netlify.app/",
+    status: "completed",
+    category: "web", // Hosted on Netlify
   },
   {
-    id: '12',
-    title: 'Cryptocurrency info site',
-    description: 'Cryptocurrency information site that uses CoinGecko API.',
-    technologies: ['nextjs', 'coingecko api', 'Vercel'],
-    liveUrl: 'https://one-five.one',
-    githubUrl: 'https://github.com/koji/cryptocurrency-info-checker',
-    status: 'completed',
-    category: 'web',
+    id: "12",
+    title: "Cryptocurrency info site",
+    description: "Cryptocurrency information site that uses CoinGecko API.",
+    technologies: ["nextjs", "coingecko api", "Vercel"],
+    liveUrl: "https://one-five.one",
+    githubUrl: "https://github.com/koji/cryptocurrency-info-checker",
+    status: "completed",
+    category: "web",
   },
   {
-    id: '13',
-    title: 'Frontend Tools',
+    id: "13",
+    title: "Frontend Tools",
     description:
-      'A collection of tools for front-end developers. Offer useful information for web development!',
-    technologies: ['nextjs', 'Contentful', 'Vercel'],
-    liveUrl: 'https://fetools.vercel.app/',
-    githubUrl: 'https://github.com/koji/frontend-tools',
-    status: 'completed',
-    category: 'web',
+      "A collection of tools for front-end developers. Offer useful information for web development!",
+    technologies: ["nextjs", "Contentful", "Vercel"],
+    liveUrl: "https://fetools.vercel.app/",
+    githubUrl: "https://github.com/koji/frontend-tools",
+    status: "completed",
+    category: "web",
   },
   {
-    id: '14',
-    title: 'github label manager',
-    description: 'Simple CLI tool to create/delete labels with GitHub Labels API.',
-    technologies: ['nodejs', 'typescript'],
-    liveUrl:
-      'https://levelup.gitconnected.com/create-github-labels-from-terminal-158d4868fabhttps://levelup.gitconnected.com/create-github-labels-from-terminal-158d4868fab', // This seems to be an article, but listed as 'link'
-    githubUrl:
-      'https://github.com/koji/github-label-managerhttps://github.com/koji/github-label-manager',
-    status: 'completed',
-    category: 'cli', // Described as CLI tool
+    id: "15",
+    title: "complexity with colors",
+    description: "This is an experimental project to try an NFT on opensea.io",
+    technologies: ["glsl", "shader"],
+    liveUrl: "https://opensea.io/collection/complexity-with-colors",
+    status: "completed",
+    category: "web", // NFT project on a web platform
   },
   {
-    id: '15',
-    title: 'complexity with colors',
-    description: 'This is an experimental project to try an NFT on opensea.io',
-    technologies: ['glsl', 'shader'],
-    liveUrl: 'https://opensea.io/collection/complexity-with-colors',
-    status: 'completed',
-    category: 'web', // NFT project on a web platform
+    id: "16",
+    title: "crypto-board",
+    description: "Cryptocurrency information with related news",
+    technologies: ["react", "typescript", "redux toolkit"],
+    liveUrl: "https://crypto-board.netlify.app/",
+    status: "completed",
+    category: "web",
   },
   {
-    id: '16',
-    title: 'crypto-board',
-    description: 'Cryptocurrency information with related news',
-    technologies: ['react', 'typescript', 'redux toolkit'],
-    liveUrl: 'https://crypto-board.netlify.app/',
-    status: 'completed',
-    category: 'web',
-  },
-  {
-    id: '17',
-    title: 'next-mint',
-    description: 'next-mint allows users to mint an NFT easily without any cost',
-    technologies: ['nextjs', 'typescript', 'NFTPortAPI'],
-    liveUrl: 'https://next-mint.vercel.app/',
-    githubUrl: 'https://github.com/koji/next-mint',
-    status: 'completed',
-    category: 'web',
+    id: "17",
+    title: "next-mint",
+    description:
+      "next-mint allows users to mint an NFT easily without any cost",
+    technologies: ["nextjs", "typescript", "NFTPortAPI"],
+    liveUrl: "https://next-mint.vercel.app/",
+    githubUrl: "https://github.com/koji/next-mint",
+    status: "completed",
+    category: "web",
   },
   // OSSProjects transformed
   {
-    id: 'oss-0', // Differentiated ID for clarity, can be made sequential if preferred
-    title: 'easyGAN',
-    description: 'easyGAN is a CLI tool which can train images and generates images with DCGAN.',
-    technologies: ['python', 'keras'],
-    liveUrl: 'https://easygan.netlify.app/',
-    status: 'completed',
-    category: 'cli', // Described as CLI tool
-  },
-  {
-    id: 'oss-1',
-    title: 'icTrainer',
+    id: "oss-0", // Differentiated ID for clarity, can be made sequential if preferred
+    title: "easyGAN",
     description:
-      'icTrainer is a CLI tool which offers a couple of functions to train own image classifier. It offers image collecting, resize, and face detector.',
-    technologies: ['python', 'keras', 'tensorflow'],
-    liveUrl: 'https://pypi.org/project/ictrainer/',
-    githubUrl: 'https://github.com/koji/icTrainer',
-    status: 'completed',
-    category: 'cli', // Described as CLI tool
+      "easyGAN is a CLI tool which can train images and generates images with DCGAN.",
+    technologies: ["python", "keras"],
+    liveUrl: "https://easygan.netlify.app/",
+    status: "completed",
+    category: "cli", // Described as CLI tool
   },
   {
-    id: 'oss-2',
-    title: 'gengitignore',
+    id: "oss-1",
+    title: "icTrainer",
     description:
-      'gengitignore is a CLI tool to generate .gitignore file. This package help developers to manage codes on Git/Github.',
-    technologies: ['nodejs'],
-    liveUrl: 'https://www.npmjs.com/package/@kojikanao/gengitignore',
-    githubUrl: 'https://github.com/koji/genigore',
-    status: 'completed',
-    category: 'cli', // Described as CLI tool
+      "icTrainer is a CLI tool which offers a couple of functions to train own image classifier. It offers image collecting, resize, and face detector.",
+    technologies: ["python", "keras", "tensorflow"],
+    liveUrl: "https://pypi.org/project/ictrainer/",
+    githubUrl: "https://github.com/koji/icTrainer",
+    status: "completed",
+    category: "cli", // Described as CLI tool
   },
   {
-    id: 'oss-3',
-    title: 'wcartist',
+    id: "oss-2",
+    title: "gengitignore",
     description:
-      'wcartist is a CLI tool which allows users to create word art with one line command.',
-    technologies: ['python'],
-    liveUrl: 'https://pypi.org/project/wcartist/',
-    githubUrl: 'https://github.com/koji/wcartist',
-    status: 'completed',
-    category: 'cli', // Described as CLI tool
+      "gengitignore is a CLI tool to generate .gitignore file. This package help developers to manage codes on Git/Github.",
+    technologies: ["nodejs"],
+    liveUrl: "https://www.npmjs.com/package/@kojikanao/gengitignore",
+    githubUrl: "https://github.com/koji/genigore",
+    status: "completed",
+    category: "cli", // Described as CLI tool
   },
   {
-    id: 'oss-4',
-    title: 'react-nes-components',
+    id: "oss-3",
+    title: "wcartist",
     description:
-      'nes-components is a react-component with nes.css. This is published as a npm package.',
-    technologies: ['react', 'typescript', 'storybook', 'Netlify'],
-    liveUrl: 'https://react-nes-components.netlify.app/',
-    githubUrl: 'https://github.com/koji/react-nes-components',
-    status: 'in-progress',
-    category: 'library', // Described as a react-component / npm package
+      "wcartist is a CLI tool which allows users to create word art with one line command.",
+    technologies: ["python"],
+    liveUrl: "https://pypi.org/project/wcartist/",
+    githubUrl: "https://github.com/koji/wcartist",
+    status: "completed",
+    category: "cli", // Described as CLI tool
   },
   {
-    id: 'oss-5',
-    title: 'mtrand',
+    id: "oss-4",
+    title: "react-nes-components",
+    description:
+      "nes-components is a react-component with nes.css. This is published as a npm package.",
+    technologies: ["react", "typescript", "storybook", "Netlify"],
+    liveUrl: "https://react-nes-components.netlify.app/",
+    githubUrl: "https://github.com/koji/react-nes-components",
+    status: "in-progress",
+    category: "library", // Described as a react-component / npm package
+  },
+  {
+    id: "oss-5",
+    title: "mtrand",
     description: "mtrand is Deno third party module and it's mt19937 for Deno.",
-    technologies: ['Deno', 'TypeScript', 'GitHub Action'],
-    liveUrl: 'https://deno.land/x/mtrand',
-    githubUrl: 'https://github.com/koji/deno-mtrand',
-    status: 'completed',
-    category: 'library', // Described as Deno third party module
+    technologies: ["Deno", "TypeScript", "GitHub Action"],
+    liveUrl: "https://deno.land/x/mtrand",
+    githubUrl: "https://github.com/koji/deno-mtrand",
+    status: "completed",
+    category: "library", // Described as Deno third party module
   },
   {
-    id: 'oss-6',
-    title: 'p5js-web-editor Japanese UI',
-    description: 'I led to add Japanese translation to p5js web editor.',
-    technologies: ['javascript', 'react', 'i18n'],
-    liveUrl: 'https://editor.p5js.org/',
-    githubUrl: 'https://github.com/koji/p5.js-web-editor',
-    status: 'in-progress',
-    category: 'web', // Contribution to a web editor
+    id: "oss-6",
+    title: "p5js-web-editor Japanese UI",
+    description: "I led to add Japanese translation to p5js web editor.",
+    technologies: ["oss", "javascript", "react", "i18n"],
+    liveUrl: "https://editor.p5js.org/",
+    githubUrl: "https://github.com/koji/p5.js-web-editor",
+    status: "in-progress",
+    category: "web", // Contribution to a web editor
   },
   {
-    id: 'oss-7',
-    title: 'ichigyou',
-    description: 'ichigyo(1行) is a collection of one-liner functions in typescript',
-    technologies: ['typescript', 'vite', 'vitest'],
-    liveUrl: 'https://koji.github.io/ichigyou/index.html',
-    githubUrl: 'https://github.com/koji/ichigyou',
-    status: 'in-progress',
-    category: 'library', // Collection of functions
+    id: "oss-7",
+    title: "ichigyou",
+    description:
+      "ichigyo(1行) is a collection of one-liner functions in typescript",
+    technologies: ["typescript", "vite", "vitest"],
+    liveUrl: "https://koji.github.io/ichigyou/index.html",
+    githubUrl: "https://github.com/koji/ichigyou",
+    status: "in-progress",
+    category: "library", // Collection of functions
   },
   {
-    id: 'oss-8',
-    title: 'eslint-plugin-no-margins',
+    id: "oss-8",
+    title: "eslint-plugin-no-margins",
     description:
-      'This is a plugin for ESLint that helps you avoid using margin-related properties in your code.',
-    technologies: ['eslint', 'typescript', 'vite', 'vitest'],
-    liveUrl: 'https://www.npmjs.com/package/eslint-plugin-no-margins',
-    githubUrl: 'https://github.com/koji/eslint-plugin-no-margins',
-    status: 'in-progress',
-    category: 'library', // ESLint plugin
+      "This is a plugin for ESLint that helps you avoid using margin-related properties in your code.",
+    technologies: ["eslint", "typescript", "vite", "vitest"],
+    liveUrl: "https://www.npmjs.com/package/eslint-plugin-no-margins",
+    githubUrl: "https://github.com/koji/eslint-plugin-no-margins",
+    status: "in-progress",
+    category: "library", // ESLint plugin
   },
   {
-    id: 'web-9',
-    title: 'x days shader',
+    id: "web-9",
+    title: "x days shader",
     description:
-      'A project showcasing daily shader experiments built with React, TypeScript, and TailwindCSS.',
-    technologies: ['react', 'typescript', 'vite', 'tailwindcss', 'shader'],
-    liveUrl: 'https://x-days-shader.netlify.app/',
-    githubUrl: 'https://github.com/koji/x-days-shader',
-    status: 'in-progress',
-    category: 'web',
+      "A project showcasing daily shader experiments built with React, TypeScript, and TailwindCSS.",
+    technologies: ["react", "typescript", "vite", "tailwindcss", "shader"],
+    liveUrl: "https://x-days-shader.netlify.app/",
+    githubUrl: "https://github.com/koji/x-days-shader",
+    status: "in-progress",
+    category: "web",
   },
-    {
-    id: 'web-10',
-    title: 'Veo3 JSON Creator',
-    description:
-      'JSON generator for Veo3',
-    technologies: ['python', 'streamlit', 'huggingface', 'github actions', 'Cerebras API'],
-    liveUrl: 'https://huggingface.co/spaces/baxin/veo3-json-creator',
-    githubUrl: '',
-    status: 'in-progress',
-    category: 'web',
+  {
+    id: "web-10",
+    title: "Veo3 JSON Creator",
+    description: "JSON generator for Veo3",
+    technologies: [
+      "python",
+      "streamlit",
+      "huggingface",
+      "github actions",
+      "Cerebras API",
+    ],
+    liveUrl: "https://huggingface.co/spaces/baxin/veo3-json-creator",
+    githubUrl: "",
+    status: "in-progress",
+    category: "web",
   },
-    {
-    id: 'oss-9',
-    title: 'hyouji',
+  {
+    id: "oss-9",
+    title: "hyouji",
     description:
-      'Simple CLI tool to create/delete labels with GitHub Labels API',
-    technologies: ['github', 'typescript', 'vite', 'cli', 'vibe-coding'],
-    liveUrl: 'https://www.npmjs.com/package/hyouji',
-    githubUrl: 'https://github.com/koji/Hyouji',
-    status: 'in-progress',
-    category: 'library',
+      "Simple CLI tool to create/delete labels with GitHub Labels API",
+    technologies: ["github", "typescript", "vite", "cli", "vibe-coding"],
+    liveUrl: "https://www.npmjs.com/package/hyouji",
+    githubUrl: "https://github.com/koji/Hyouji",
+    status: "in-progress",
+    category: "library",
   },
 ];
