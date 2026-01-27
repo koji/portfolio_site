@@ -7,15 +7,15 @@ const Contact = () => {
   return (
     <section
       id="contact"
-      className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-t from-background to-muted/30"
+      className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-t from-transparent to-muted/30"
     >
       <div className="max-w-4xl mx-auto">
         {/* Section Header */}
         <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6">
-            Let's <span className="text-gradient font-japanese">Connect 連絡</span>
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6 text-shadow-md">
+            Let's <span className="text-gradient font-japanese japanese-shadow">Connect 連絡</span>
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto text-shadow-sm">
             Whether you have a project in mind, want to collaborate, or just say hello - I'd love to
             hear from you.
           </p>

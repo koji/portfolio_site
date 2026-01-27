@@ -1,5 +1,5 @@
 import About from '@/components/About';
-import BonsaiShaderBackground from '@/components/BonsaiShaderBackground';
+import ChaosBackground from '@/components/ChaosBackground';
 import Contact from '@/components/Contact';
 import GoToTopButton from '@/components/GoToTopButton';
 import Hero from '@/components/Hero';
@@ -19,9 +19,9 @@ export const Index = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background text-foreground relative">
-      {/* Shader-based Bonsai Background */}
-      <BonsaiShaderBackground />
+    <div className="min-h-screen text-foreground relative">
+      {/* Shader-based Chaos Background */}
+      <ChaosBackground />
 
       {/* Content */}
       <div className="relative z-10">
@@ -37,7 +37,7 @@ export const Index = () => {
       </div>
 
       {/* Go to Top Button - Positioned on the right for better accessibility */}
-      <GoToTopButton 
+      <GoToTopButton
         position="bottom-right"
         showAfter={150}
         showScrollProgress={true}

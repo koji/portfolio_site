@@ -15,7 +15,7 @@ const Hero = () => {
       className="min-h-screen flex items-center justify-center relative overflow-hidden"
     >
       {/* Background Elements */}
-      <div className="absolute inset-0 bg-gradient-to-br from-background via-background to-accent/5" />
+      <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-accent/5" />
       <div className="absolute top-20 right-10 w-32 h-32 bg-vermilion-200/30 rounded-full blur-3xl animate-float" />
       <div
         className="absolute bottom-20 left-10 w-48 h-48 bg-sakura-200/30 rounded-full blur-3xl animate-float"
@@ -49,10 +49,10 @@ const Hero = () => {
             animationDelay: '0.4s',
           }}
         >
-          <p className="text-xl sm:text-2xl lg:text-3xl text-foreground/80 mb-4">
+          <p className="text-xl sm:text-2xl lg:text-3xl text-foreground/80 mb-4 text-shadow-sm">
             Developer & Creator
           </p>
-          <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+          <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed text-shadow-sm">
             Building digital experiences with modern web technologies, open-source contributions,
             and a passion for clean, accessible design.
           </p>
@@ -65,7 +65,7 @@ const Hero = () => {
             animationDelay: '0.6s',
           }}
         >
-          <div className="text-6xl sm:text-8xl lg:text-9xl font-japanese text-primary/20 select-none">
+          <div className="text-6xl sm:text-8xl lg:text-9xl font-japanese text-primary/40 select-none text-shadow-sm">
             創造
           </div>
           <p className="text-sm text-muted-foreground font-japanese mt-2">(sōzō - creation)</p>

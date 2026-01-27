@@ -23,10 +23,13 @@ const PersonalProjects = () => {
       <div className="max-w-6xl mx-auto">
         {/* Section Header */}
         <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6">
-            Personal <span className="text-gradient font-japanese">Projects プロジェクト</span>
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6 text-shadow-md">
+            Personal{' '}
+            <span className="text-gradient font-japanese japanese-shadow">
+              Projects プロジェクト
+            </span>
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto text-shadow-sm">
             Open-source projects and personal experiments exploring new technologies and ideas
           </p>
         </div>

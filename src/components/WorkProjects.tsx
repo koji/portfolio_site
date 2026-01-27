@@ -9,15 +9,16 @@ export const WorkProjects = () => {
   return (
     <section
       id="work"
-      className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-background to-muted/30"
+      className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-transparent to-muted/30"
     >
       <div className="max-w-6xl mx-auto">
         {/* Section Header */}
         <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6">
-            Professional <span className="text-gradient font-japanese">Work 仕事</span>
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6 text-shadow-md">
+            Professional{' '}
+            <span className="text-gradient font-japanese japanese-shadow">Work 仕事</span>
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto text-shadow-sm">
             Enterprise projects and professional experience building scalable applications
           </p>
         </div>
