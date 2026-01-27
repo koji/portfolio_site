@@ -76,7 +76,7 @@ const ChaosBackground = () => {
       float map(vec3 p) {
           float res = 1e9;
           
-          // Reduced iterations from 100 to 50 for performance optimization
+          // Use a reduced iteration count here for performance optimization
           for (int i = 0; i < 50; i++) {
               float fi = float(i);
               float time = iTime * (0.5 + fi * 0.1);
