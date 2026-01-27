@@ -36,7 +36,7 @@ const PersonalProjects = () => {
 
         {/* Projects Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-          {personalProjects.map((project, index) => (
+          {[...personalProjects].reverse().map((project, index) => (
             <Card
               key={project.id}
               className="bg-card/50 backdrop-blur-sm border-border/50 hover:shadow-lg transition-all duration-300 group animate-fade-in hover:scale-105"

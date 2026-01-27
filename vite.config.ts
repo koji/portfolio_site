@@ -19,4 +19,22 @@ export default defineConfig(() => ({
     environment: 'jsdom',
     setupFiles: ['./src/test-setup.ts'],
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-react': [
+            'react',
+            'react-dom',
+            'react-router-dom',
+            '@radix-ui/react-dialog',
+            '@radix-ui/react-slot',
+            'class-variance-authority',
+            'lucide-react',
+          ],
+          'vendor-three': ['three'],
+        },
+      },
+    },
+  },
 }));

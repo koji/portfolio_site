@@ -18,7 +18,8 @@ const ChaosBackground = () => {
       const width = window.innerWidth;
       const height = window.innerHeight;
       renderer.setSize(width, height);
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      // Optimize pixel ratio for performance (max 1.5 to save GPU on high-DPI screens)
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
       if (material.uniforms.iResolution) {
         material.uniforms.iResolution.value.set(width, height, 1);
       }
@@ -75,7 +76,8 @@ const ChaosBackground = () => {
       float map(vec3 p) {
           float res = 1e9;
           
-          for (int i = 0; i < 100; i++) {
+          // Reduced iterations from 100 to 50 for performance optimization
+          for (int i = 0; i < 50; i++) {
               float fi = float(i);
               float time = iTime * (0.5 + fi * 0.1);
               
@@ -92,7 +94,7 @@ const ChaosBackground = () => {
               p_local.xy *= mat2(cos(rot_angle*0.7), -sin(rot_angle*0.7), sin(rot_angle*0.7), cos(rot_angle*0.7));
               
               float shape_dist;
-              if(i<30) {
+              if(i<15) {
                   shape_dist = sdOctahedron(p_local, 0.7); 
               } else {
                   shape_dist = sdTetrahedron(p_local, 0.3);
@@ -125,7 +127,8 @@ const ChaosBackground = () => {
           vec3 rd = normalize(uv.x * uu + uv.y * vv + 2.0 * ww);
 
           float t = 0.0;
-          for (int i = 0; i < 100; i++) {
+          // Reduced iterations from 100 to 60 for performance
+          for (int i = 0; i < 60; i++) {
               vec3 p = ro + rd * t;
               float d = map(p);
               if (d < 0.001) break;
