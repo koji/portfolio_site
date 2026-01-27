@@ -310,7 +310,7 @@ export const personalProjects: PersonalProject[] = [
     id: "oss-10",
     title: "Answer Before You Go",
     description:
-      "A Chrome extension that blocks access to selected sites (YouTube, TikTok, Netflix, X, etc.) until the user completes a short quiz. Navigation is unlocked only after all answers are correct. The backend is written in python to call gpt-oss-120b on Cerebras",
+      "A Chrome extension that blocks access to selected sites (YouTube, TikTok, Netflix, X, etc.) until the user completes a short quiz. Navigation is unlocked only after all answers are correct. The backend is written in Python to call gpt-oss-120b on Cerebras",
     technologies: [
       "github",
       "typescript",
