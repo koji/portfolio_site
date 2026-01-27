@@ -127,7 +127,8 @@ const ChaosBackground = () => {
           vec3 rd = normalize(uv.x * uu + uv.y * vv + 2.0 * ww);
 
           float t = 0.0;
-          // Reduced iterations from 100 to 60 for performance
+          // Reduced iterations from 100 to 60 for performance; this slightly lowers ray-march detail/precision,
+          // but the visual impact is minimal for this background effect and helps maintain smooth frame rates.
           for (int i = 0; i < 60; i++) {
               vec3 p = ro + rd * t;
               float d = map(p);
