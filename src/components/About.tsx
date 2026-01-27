@@ -6,15 +6,15 @@ const About = () => {
   return (
     <section id="about" className="py-20 px-4 sm:px-6 lg:px-8 relative">
       {/* Background Elements */}
-      <div className="absolute inset-0 bg-gradient-to-b from-background to-accent/5" />
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent to-accent/5" />
 
       <div className="max-w-6xl mx-auto relative z-10">
         {/* Section Header */}
         <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6">
-            About <span className="text-gradient font-japanese">私について</span>
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6 text-shadow-md">
+            About <span className="text-gradient font-japanese japanese-shadow">私について</span>
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto text-shadow-sm">
             Developer, creator, and lifelong learner passionate about building meaningful digital
             experiences.
           </p>
