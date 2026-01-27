@@ -6,7 +6,7 @@ interface PersonalProject {
   githubUrl?: string;
   liveUrl?: string;
   status: "completed" | "in-progress" | "planned";
-  category: "web" | "mobile" | "cli" | "library";
+  category: "web" | "mobile" | "cli" | "library" | "chrome-extension";
 }
 
 export const personalProjects: PersonalProject[] = [
@@ -305,5 +305,23 @@ export const personalProjects: PersonalProject[] = [
     githubUrl: "https://github.com/koji/Hyouji",
     status: "in-progress",
     category: "library",
+  },
+  {
+    id: "oss-10",
+    title: "Answer Before You Go",
+    description:
+      "A Chrome extension that blocks access to selected sites (YouTube, TikTok, Netflix, X, etc.) until the user completes a short quiz. Navigation is unlocked only after all answers are correct. The backend is written in Python to call gpt-oss-120b on Cerebras",
+    technologies: [
+      "github",
+      "typescript",
+      "bun",
+      "chrome-extension",
+      "llm",
+      "huggingface",
+    ],
+    liveUrl: "https://github.com/koji/answer-before-you-go",
+    githubUrl: "https://github.com/koji/answer-before-you-go",
+    status: "in-progress",
+    category: "chrome-extension",
   },
 ];
