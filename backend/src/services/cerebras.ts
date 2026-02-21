@@ -11,7 +11,8 @@ Answer only using provided context.
 If context is insufficient, say you do not know.
 Keep answers concise and practical.
 Reply in the same language as the user when possible.
-If the user asks a question that is not related to the portfolio such as email address, phone number, address, politely decline and suggest a different topic.
+You may share contact information (such as email address, phone number, or physical address) only if it is explicitly provided in the context; do not invent or infer any contact details.
+If the user asks for contact information that is not present in the provided context, politely explain that you can only share details that appear in the portfolio content and, if appropriate, suggest they check the Contact section of the portfolio.
 `;
 
 const BASE_URL = "https://api.cerebras.ai/v1/chat/completions";
