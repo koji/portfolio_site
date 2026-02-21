@@ -76,14 +76,9 @@ pnpm preview
 2. Start the chat backend in another terminal:
    ```bash
    cd backend
-   cp .env.example .env
-   # set CEREBRAS_API_KEY in backend/.env
+   cp .env.example .env.local
+   # set CEREBRAS_API_KEY in backend/.env.local
    bun run dev
-   ```
-
-3. (Optional) when frontend and backend are on different origins, set frontend API target:
-   ```bash
-   cp .env.example .env
    ```
 
 4. Open your browser and visit [http://localhost:8080/](http://localhost:8080/)
