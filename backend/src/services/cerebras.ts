@@ -51,8 +51,12 @@ export class CerebrasClient {
     });
 
     if (!response.ok) {
-      const text = await response.text();
-      throw new Error(`Cerebras API error: ${response.status} ${text}`);
+      const errorText = await response.text();
+      console.error("Cerebras API error response:", {
+        status: response.status,
+        body: errorText,
+      });
+      throw new Error("Cerebras API request failed. Please try again later.");
     }
 
     const body = (await response.json()) as {
