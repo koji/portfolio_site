@@ -5,7 +5,7 @@
  * and cross-browser compatibility utilities for the enhanced shader system.
  */
 
-export interface PerformanceMetrics {
+interface PerformanceMetrics {
   frameRate: number;
   frameTime: number;
   memoryUsage: number;
@@ -14,7 +14,7 @@ export interface PerformanceMetrics {
   lastFrameTimestamp: number;
 }
 
-export interface DeviceCapabilities {
+interface DeviceCapabilities {
   webglVersion: number;
   maxTextureSize: number;
   maxVertexUniforms: number;
@@ -28,7 +28,7 @@ export interface DeviceCapabilities {
   supportsHalfFloatTextures: boolean;
 }
 
-export interface OptimizationSettings {
+interface OptimizationSettings {
   particleCount: number;
   renderScale: number;
   animationSpeed: number;
@@ -491,7 +491,7 @@ export class AdaptiveQualityManager {
  * 
  * Fine-tunes shader parameters for optimal visual impact and performance
  */
-export class ShaderParameterOptimizer {
+class ShaderParameterOptimizer {
   /**
    * Get optimized shader uniforms based on device capabilities and performance
    */
