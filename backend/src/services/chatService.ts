@@ -20,25 +20,25 @@ export class ChatService {
     }
 
     this.bootstrapPromise = (async () => {
-      const docs = await loadPortfolioDocuments();
-      this.retriever.upsertDocuments(docs);
-      this.isReady = true;
-      console.log(
-        `[chat] bootstrap completed: docs=${docs.length}, chunks=${this.retriever.chunkCount()}`,
-      );
-
-      if (docs.length === 0) {
-        console.warn(
-          "[chat] no documents were loaded. Please add knowledge files.",
+      try {
+        const docs = await loadPortfolioDocuments();
+        this.retriever.upsertDocuments(docs);
+        this.isReady = true;
+        console.log(
+          `[chat] bootstrap completed: docs=${docs.length}, chunks=${this.retriever.chunkCount()}`,
         );
+
+        if (docs.length === 0) {
+          console.warn(
+            "[chat] no documents were loaded. Please add knowledge files.",
+          );
+        }
+      } finally {
+        this.bootstrapPromise = undefined;
       }
     })();
 
-    try {
-      await this.bootstrapPromise;
-    } finally {
-      this.bootstrapPromise = undefined;
-    }
+    await this.bootstrapPromise;
   }
 
   async ask(message: string, history: ChatTurn[]) {
