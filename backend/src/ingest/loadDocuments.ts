@@ -62,7 +62,8 @@ const readSourcePath = async (source: SourceConfig): Promise<SourceDocument[]> =
 
       return docs;
     }
-  } catch {
+  } catch (error) {
+    console.error(`Failed to read source path "${source.path}":`, error);
     return [];
   }
 
