@@ -13,6 +13,7 @@ A modern, responsive portfolio website built with React and TypeScript. This pro
 - **Routing**: Client-side navigation with react-router-dom
 - **Data Visualization**: Charts and graphs with recharts
 - **Accessibility**: Built with accessibility in mind
+- **Portfolio Chat**: RAG-style chat backed by a dedicated backend and Cerebras API
 
 ## 🛠️ Tech Stack
 
@@ -33,6 +34,11 @@ cd portfolio_site
 
 # Install dependencies
 pnpm install
+
+# Install backend dependencies
+cd backend
+pnpm install
+cd ..
 ```
 
 ## 🧰 Available Scripts
@@ -67,9 +73,22 @@ pnpm preview
    pnpm dev
    ```
 
-2. Open your browser and visit [http://localhost:5173/](http://localhost:5173/)
+2. Start the chat backend in another terminal:
+   ```bash
+   cd backend
+   cp .env.example .env
+   # set CEREBRAS_API_KEY in backend/.env
+   bun run dev
+   ```
 
-3. Make changes to files in the `src` directory to see live updates
+3. (Optional) when frontend and backend are on different origins, set frontend API target:
+   ```bash
+   cp .env.example .env
+   ```
+
+4. Open your browser and visit [http://localhost:8080/](http://localhost:8080/)
+
+5. Make changes to files in the `src` directory to see live updates
 
 ## 🌐 Deployment
 
