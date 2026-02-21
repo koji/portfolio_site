@@ -16,10 +16,10 @@ Express + TypeScript backend for portfolio chat.
 
 ```bash
 cd backend
-pnpm install
+bun install
 cp .env.example .env
 # set CEREBRAS_API_KEY in .env
-pnpm dev
+bun run dev
 ```
 
 Server runs at `http://localhost:8787` by default.
