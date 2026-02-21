@@ -146,6 +146,7 @@ const PortfolioChat = () => {
               className="mb-3 min-h-[96px] w-full resize-none rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
               onChange={(event) => setInput(event.target.value)}
               placeholder="Enter your question..."
+              aria-label="Enter a question in chat"
               value={input}
             />
             <button
