@@ -46,23 +46,23 @@ cd ..
 ```bash
 # Start development server
 bun run dev
-pnpm dev
+pnpm run dev
 
 # Build for production
 bun run build
-pnpm build
+pnpm run build
 
 # Build for development
 bun run build:dev
-pnpm build:dev
+pnpm run build:dev
 
 # Lint code
 bun run lint
-pnpm lint
+pnpm run lint
 
 # Preview production build
 bun run preview
-pnpm preview
+pnpm run preview
 ```
 
 ## 🚧 Development
@@ -70,7 +70,7 @@ pnpm preview
 1. Start the development server:
    ```bash
    bun run dev
-   pnpm dev
+   pnpm run dev
    ```
 
 2. Start the chat backend in another terminal:
@@ -91,7 +91,7 @@ Build the project for production:
 
 ```bash
 bun run build
-pnpm build
+pnpm run build
 ```
 
 The build artifacts will be stored in the `dist/` directory, ready to be deployed to your hosting provider of choice.
