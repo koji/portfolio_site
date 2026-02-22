@@ -38,6 +38,18 @@ interface OptimizationSettings {
   targetFrameRate: number;
 }
 
+type NumericOptimizationSettingKey = {
+  [K in keyof OptimizationSettings]: OptimizationSettings[K] extends number
+    ? K
+    : never;
+}[keyof OptimizationSettings];
+
+type BooleanOptimizationSettingKey = {
+  [K in keyof OptimizationSettings]: OptimizationSettings[K] extends boolean
+    ? K
+    : never;
+}[keyof OptimizationSettings];
+
 /**
  * Performance Monitor Class
  *
@@ -441,6 +453,19 @@ export class AdaptiveQualityManager {
   private currentSettings: OptimizationSettings;
   private adjustmentCooldown = 0;
   private readonly cooldownDuration = 2000; // 2 seconds
+  private static readonly numericSettingKeys =
+    new Set<NumericOptimizationSettingKey>([
+      "particleCount",
+      "renderScale",
+      "animationSpeed",
+      "qualityLevel",
+      "targetFrameRate",
+    ]);
+  private static readonly booleanSettingKeys =
+    new Set<BooleanOptimizationSettingKey>([
+      "interactionEnabled",
+      "enableAdvancedEffects",
+    ]);
 
   constructor() {
     this.performanceMonitor = new PerformanceMonitor();
@@ -487,22 +512,43 @@ export class AdaptiveQualityManager {
   ): OptimizationSettings {
     const blended = { ...current };
 
-    Object.entries(target).forEach(([key, value]) => {
+    for (const [key, value] of Object.entries(target) as [
+      keyof OptimizationSettings,
+      OptimizationSettings[keyof OptimizationSettings] | undefined,
+    ][]) {
       if (
-        typeof value === "number" &&
-        typeof current[key as keyof OptimizationSettings] === "number"
+        value !== undefined &&
+        this.isNumericSettingKey(key) &&
+        typeof value === "number"
       ) {
-        const currentValue = current[
-          key as keyof OptimizationSettings
-        ] as number;
-        blended[key as keyof OptimizationSettings] = (currentValue +
-          (value - currentValue) * factor) as any;
-      } else if (typeof value === "boolean") {
-        blended[key as keyof OptimizationSettings] = value as any;
+        const currentValue = current[key];
+        blended[key] = currentValue + (value - currentValue) * factor;
+      } else if (
+        value !== undefined &&
+        this.isBooleanSettingKey(key) &&
+        typeof value === "boolean"
+      ) {
+        blended[key] = value;
       }
-    });
+    }
 
     return blended;
+  }
+
+  private isNumericSettingKey(
+    key: keyof OptimizationSettings,
+  ): key is NumericOptimizationSettingKey {
+    return AdaptiveQualityManager.numericSettingKeys.has(
+      key as NumericOptimizationSettingKey,
+    );
+  }
+
+  private isBooleanSettingKey(
+    key: keyof OptimizationSettings,
+  ): key is BooleanOptimizationSettingKey {
+    return AdaptiveQualityManager.booleanSettingKeys.has(
+      key as BooleanOptimizationSettingKey,
+    );
   }
 
   /**
