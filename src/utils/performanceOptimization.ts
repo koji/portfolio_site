@@ -540,11 +540,6 @@ export class AdaptiveQualityManager {
  * Fine-tunes shader parameters for optimal visual impact and performance
  */
 class ShaderParameterOptimizer {
-  private static readonly defaultUniformTypeHint: Record<
-    string,
-    number | boolean
-  > = {};
-
   /**
    * Get optimized shader uniforms based on device capabilities and performance
    */
