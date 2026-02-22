@@ -1,11 +1,11 @@
 /**
  * Performance Optimization Utilities for Enhanced Shader Background
- * 
+ *
  * This module provides comprehensive performance monitoring, optimization,
  * and cross-browser compatibility utilities for the enhanced shader system.
  */
 
-export interface PerformanceMetrics {
+interface PerformanceMetrics {
   frameRate: number;
   frameTime: number;
   memoryUsage: number;
@@ -14,7 +14,7 @@ export interface PerformanceMetrics {
   lastFrameTimestamp: number;
 }
 
-export interface DeviceCapabilities {
+interface DeviceCapabilities {
   webglVersion: number;
   maxTextureSize: number;
   maxVertexUniforms: number;
@@ -28,7 +28,7 @@ export interface DeviceCapabilities {
   supportsHalfFloatTextures: boolean;
 }
 
-export interface OptimizationSettings {
+interface OptimizationSettings {
   particleCount: number;
   renderScale: number;
   animationSpeed: number;
@@ -38,9 +38,21 @@ export interface OptimizationSettings {
   targetFrameRate: number;
 }
 
+type NumericOptimizationSettingKey = {
+  [K in keyof OptimizationSettings]: OptimizationSettings[K] extends number
+    ? K
+    : never;
+}[keyof OptimizationSettings];
+
+type BooleanOptimizationSettingKey = {
+  [K in keyof OptimizationSettings]: OptimizationSettings[K] extends boolean
+    ? K
+    : never;
+}[keyof OptimizationSettings];
+
 /**
  * Performance Monitor Class
- * 
+ *
  * Continuously monitors shader performance and provides optimization recommendations
  */
 export class PerformanceMonitor {
@@ -50,7 +62,7 @@ export class PerformanceMonitor {
   private readonly maxHistoryLength = 60; // 1 second at 60fps
   private performanceObserver?: PerformanceObserver;
   private memoryCheckInterval?: number;
-  
+
   public metrics: PerformanceMetrics = {
     frameRate: 60,
     frameTime: 16.67,
@@ -65,20 +77,23 @@ export class PerformanceMonitor {
   }
 
   private initializePerformanceObserver(): void {
-    if ('PerformanceObserver' in window) {
+    if ("PerformanceObserver" in window) {
       try {
         this.performanceObserver = new PerformanceObserver((list) => {
           const entries = list.getEntries();
           for (const entry of entries) {
-            if (entry.entryType === 'measure' && entry.name.includes('shader-render')) {
+            if (
+              entry.entryType === "measure" &&
+              entry.name.includes("shader-render")
+            ) {
               this.metrics.renderTime = entry.duration;
             }
           }
         });
-        
-        this.performanceObserver.observe({ entryTypes: ['measure'] });
+
+        this.performanceObserver.observe({ entryTypes: ["measure"] });
       } catch (error) {
-        console.warn('PerformanceObserver not supported:', error);
+        console.warn("PerformanceObserver not supported:", error);
       }
     }
   }
@@ -91,7 +106,7 @@ export class PerformanceMonitor {
   }
 
   private updateMemoryMetrics(): void {
-    if ('memory' in performance) {
+    if ("memory" in performance) {
       const memory = (performance as any).memory;
       this.metrics.memoryUsage = memory.usedJSHeapSize / (1024 * 1024); // MB
     }
@@ -108,18 +123,20 @@ export class PerformanceMonitor {
 
     const deltaTime = timestamp - this.lastTime;
     this.frameTimeHistory.push(deltaTime);
-    
+
     if (this.frameTimeHistory.length > this.maxHistoryLength) {
       this.frameTimeHistory.shift();
     }
 
     // Calculate average frame time over the last second
-    const avgFrameTime = this.frameTimeHistory.reduce((a, b) => a + b, 0) / this.frameTimeHistory.length;
-    
+    const avgFrameTime =
+      this.frameTimeHistory.reduce((a, b) => a + b, 0) /
+      this.frameTimeHistory.length;
+
     this.metrics.frameTime = avgFrameTime;
     this.metrics.frameRate = 1000 / avgFrameTime;
     this.metrics.lastFrameTimestamp = timestamp;
-    
+
     this.lastTime = timestamp;
     this.frameCount++;
   }
@@ -129,16 +146,22 @@ export class PerformanceMonitor {
    */
   public getOptimizationRecommendations(): Partial<OptimizationSettings> {
     const recommendations: Partial<OptimizationSettings> = {};
-    
+
     // Frame rate based optimizations
     if (this.metrics.frameRate < 30) {
-      recommendations.particleCount = Math.max(20, Math.floor(this.metrics.frameRate * 2));
+      recommendations.particleCount = Math.max(
+        20,
+        Math.floor(this.metrics.frameRate * 2),
+      );
       recommendations.renderScale = 0.6;
       recommendations.qualityLevel = 0.3;
       recommendations.enableAdvancedEffects = false;
       recommendations.interactionEnabled = false;
     } else if (this.metrics.frameRate < 45) {
-      recommendations.particleCount = Math.max(50, Math.floor(this.metrics.frameRate * 2));
+      recommendations.particleCount = Math.max(
+        50,
+        Math.floor(this.metrics.frameRate * 2),
+      );
       recommendations.renderScale = 0.8;
       recommendations.qualityLevel = 0.6;
       recommendations.enableAdvancedEffects = false;
@@ -148,8 +171,12 @@ export class PerformanceMonitor {
     }
 
     // Memory based optimizations
-    if (this.metrics.memoryUsage > 200) { // 200MB threshold
-      recommendations.particleCount = Math.min(recommendations.particleCount || 100, 75);
+    if (this.metrics.memoryUsage > 200) {
+      // 200MB threshold
+      recommendations.particleCount = Math.min(
+        recommendations.particleCount || 100,
+        75,
+      );
       recommendations.enableAdvancedEffects = false;
     }
 
@@ -170,7 +197,7 @@ export class PerformanceMonitor {
     if (this.performanceObserver) {
       this.performanceObserver.disconnect();
     }
-    
+
     if (this.memoryCheckInterval) {
       clearInterval(this.memoryCheckInterval);
     }
@@ -179,7 +206,7 @@ export class PerformanceMonitor {
 
 /**
  * Device Capability Detection
- * 
+ *
  * Detects device capabilities and provides optimization recommendations
  */
 export class DeviceCapabilityDetector {
@@ -193,9 +220,12 @@ export class DeviceCapabilityDetector {
       return this.capabilities;
     }
 
-    const canvas = document.createElement('canvas');
-    const gl = canvas.getContext('webgl2') || canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-    
+    const canvas = document.createElement("canvas");
+    const gl =
+      canvas.getContext("webgl2") ||
+      canvas.getContext("webgl") ||
+      canvas.getContext("experimental-webgl");
+
     if (!gl) {
       // Fallback for devices without WebGL
       this.capabilities = {
@@ -204,8 +234,8 @@ export class DeviceCapabilityDetector {
         maxVertexUniforms: 0,
         maxFragmentUniforms: 0,
         extensions: [],
-        vendor: 'unknown',
-        renderer: 'unknown',
+        vendor: "unknown",
+        renderer: "unknown",
         isHighPerformance: false,
         isMobile: this.isMobileDevice(),
         supportsFloatTextures: false,
@@ -214,37 +244,48 @@ export class DeviceCapabilityDetector {
       return this.capabilities;
     }
 
-    const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
-    const extensions = (typeof gl.getSupportedExtensions === 'function' ? gl.getSupportedExtensions() : []) || [];
-    
+    const debugInfo = gl.getExtension("WEBGL_debug_renderer_info");
+    const extensions =
+      (typeof gl.getSupportedExtensions === "function"
+        ? gl.getSupportedExtensions()
+        : []) || [];
+
     // Safe WebGL2 detection for test environments
     let webglVersion = 1;
     try {
-      if (typeof WebGL2RenderingContext !== 'undefined' && gl instanceof WebGL2RenderingContext) {
+      if (
+        typeof WebGL2RenderingContext !== "undefined" &&
+        gl instanceof WebGL2RenderingContext
+      ) {
         webglVersion = 2;
       }
     } catch (error) {
       // WebGL2RenderingContext might not be available in test environment
       webglVersion = 1;
     }
-    
+
     this.capabilities = {
       webglVersion,
       maxTextureSize: gl.getParameter(gl.MAX_TEXTURE_SIZE) || 1024,
       maxVertexUniforms: gl.getParameter(gl.MAX_VERTEX_UNIFORM_VECTORS) || 128,
-      maxFragmentUniforms: gl.getParameter(gl.MAX_FRAGMENT_UNIFORM_VECTORS) || 128,
+      maxFragmentUniforms:
+        gl.getParameter(gl.MAX_FRAGMENT_UNIFORM_VECTORS) || 128,
       extensions,
-      vendor: debugInfo ? gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL) : 'unknown',
-      renderer: debugInfo ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) : 'unknown',
+      vendor: debugInfo
+        ? gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL)
+        : "unknown",
+      renderer: debugInfo
+        ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL)
+        : "unknown",
       isHighPerformance: this.isHighPerformanceDevice(),
       isMobile: this.isMobileDevice(),
-      supportsFloatTextures: extensions.includes('OES_texture_float'),
-      supportsHalfFloatTextures: extensions.includes('OES_texture_half_float'),
+      supportsFloatTextures: extensions.includes("OES_texture_float"),
+      supportsHalfFloatTextures: extensions.includes("OES_texture_half_float"),
     };
 
     // Clean up
     canvas.remove();
-    
+
     return this.capabilities;
   }
 
@@ -252,12 +293,16 @@ export class DeviceCapabilityDetector {
     const hardwareConcurrency = navigator.hardwareConcurrency || 4;
     const deviceMemory = (navigator as any).deviceMemory || 4;
     const devicePixelRatio = window.devicePixelRatio || 1;
-    
-    return hardwareConcurrency >= 8 && deviceMemory >= 8 && devicePixelRatio >= 2;
+
+    return (
+      hardwareConcurrency >= 8 && deviceMemory >= 8 && devicePixelRatio >= 2
+    );
   }
 
   private isMobileDevice(): boolean {
-    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+      navigator.userAgent,
+    );
   }
 
   /**
@@ -265,7 +310,7 @@ export class DeviceCapabilityDetector {
    */
   public getRecommendedSettings(): OptimizationSettings {
     const caps = this.detectCapabilities();
-    
+
     if (caps.isMobile) {
       return {
         particleCount: 30,
@@ -277,7 +322,7 @@ export class DeviceCapabilityDetector {
         targetFrameRate: 30,
       };
     }
-    
+
     if (caps.isHighPerformance) {
       return {
         particleCount: 200,
@@ -289,7 +334,7 @@ export class DeviceCapabilityDetector {
         targetFrameRate: 60,
       };
     }
-    
+
     // Default desktop settings
     return {
       particleCount: 100,
@@ -312,8 +357,9 @@ export class CrossBrowserCompatibility {
    */
   public static isWebGLSupported(): boolean {
     try {
-      const canvas = document.createElement('canvas');
-      const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+      const canvas = document.createElement("canvas");
+      const gl =
+        canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
       canvas.remove();
       return !!gl;
     } catch (error) {
@@ -326,8 +372,8 @@ export class CrossBrowserCompatibility {
    */
   public static isWebGL2Supported(): boolean {
     try {
-      const canvas = document.createElement('canvas');
-      const gl = canvas.getContext('webgl2');
+      const canvas = document.createElement("canvas");
+      const gl = canvas.getContext("webgl2");
       canvas.remove();
       return !!gl;
     } catch (error) {
@@ -343,26 +389,26 @@ export class CrossBrowserCompatibility {
     const optimizations: Partial<OptimizationSettings> = {};
 
     // Safari optimizations
-    if (userAgent.includes('safari') && !userAgent.includes('chrome')) {
+    if (userAgent.includes("safari") && !userAgent.includes("chrome")) {
       optimizations.renderScale = 0.8;
       optimizations.particleCount = 80;
       optimizations.enableAdvancedEffects = false;
     }
-    
+
     // Firefox optimizations
-    else if (userAgent.includes('firefox')) {
+    else if (userAgent.includes("firefox")) {
       optimizations.renderScale = 0.9;
       optimizations.qualityLevel = 0.9;
     }
-    
+
     // Chrome/Edge optimizations
-    else if (userAgent.includes('chrome') || userAgent.includes('edg')) {
+    else if (userAgent.includes("chrome") || userAgent.includes("edg")) {
       optimizations.qualityLevel = 1.0;
       optimizations.enableAdvancedEffects = true;
     }
 
     // Mobile browser optimizations
-    if (userAgent.includes('mobile')) {
+    if (userAgent.includes("mobile")) {
       optimizations.particleCount = 40;
       optimizations.renderScale = 0.6;
       optimizations.interactionEnabled = false;
@@ -377,26 +423,28 @@ export class CrossBrowserCompatibility {
    */
   public static getBrowserWorkarounds(): { [key: string]: boolean } {
     const userAgent = navigator.userAgent.toLowerCase();
-    
+
     return {
       // Safari has issues with certain WebGL extensions
-      disableFloatTextures: userAgent.includes('safari') && !userAgent.includes('chrome'),
-      
+      disableFloatTextures:
+        userAgent.includes("safari") && !userAgent.includes("chrome"),
+
       // Firefox sometimes has context loss issues
-      enableContextLossWorkaround: userAgent.includes('firefox'),
-      
+      enableContextLossWorkaround: userAgent.includes("firefox"),
+
       // Mobile browsers need reduced precision
-      useReducedPrecision: userAgent.includes('mobile'),
-      
+      useReducedPrecision: userAgent.includes("mobile"),
+
       // Some Android browsers have shader compilation issues
-      useSimplifiedShaders: userAgent.includes('android') && userAgent.includes('chrome/'),
+      useSimplifiedShaders:
+        userAgent.includes("android") && userAgent.includes("chrome/"),
     };
   }
 }
 
 /**
  * Adaptive Quality Manager
- * 
+ *
  * Automatically adjusts quality settings based on performance
  */
 export class AdaptiveQualityManager {
@@ -405,14 +453,28 @@ export class AdaptiveQualityManager {
   private currentSettings: OptimizationSettings;
   private adjustmentCooldown = 0;
   private readonly cooldownDuration = 2000; // 2 seconds
+  private static readonly numericSettingKeys =
+    new Set<NumericOptimizationSettingKey>([
+      "particleCount",
+      "renderScale",
+      "animationSpeed",
+      "qualityLevel",
+      "targetFrameRate",
+    ]);
+  private static readonly booleanSettingKeys =
+    new Set<BooleanOptimizationSettingKey>([
+      "interactionEnabled",
+      "enableAdvancedEffects",
+    ]);
 
   constructor() {
     this.performanceMonitor = new PerformanceMonitor();
     this.deviceDetector = new DeviceCapabilityDetector();
     this.currentSettings = this.deviceDetector.getRecommendedSettings();
-    
+
     // Apply browser-specific optimizations
-    const browserOptimizations = CrossBrowserCompatibility.getBrowserOptimizations();
+    const browserOptimizations =
+      CrossBrowserCompatibility.getBrowserOptimizations();
     this.currentSettings = { ...this.currentSettings, ...browserOptimizations };
   }
 
@@ -421,17 +483,22 @@ export class AdaptiveQualityManager {
    */
   public updateQuality(timestamp: number): OptimizationSettings {
     this.performanceMonitor.updateFrame(timestamp);
-    
+
     // Only adjust settings if cooldown has passed
     if (timestamp - this.adjustmentCooldown < this.cooldownDuration) {
       return this.currentSettings;
     }
 
-    const recommendations = this.performanceMonitor.getOptimizationRecommendations();
-    
+    const recommendations =
+      this.performanceMonitor.getOptimizationRecommendations();
+
     if (Object.keys(recommendations).length > 0) {
       // Apply recommendations gradually to avoid jarring changes
-      this.currentSettings = this.blendSettings(this.currentSettings, recommendations, 0.3);
+      this.currentSettings = this.blendSettings(
+        this.currentSettings,
+        recommendations,
+        0.3,
+      );
       this.adjustmentCooldown = timestamp;
     }
 
@@ -439,22 +506,49 @@ export class AdaptiveQualityManager {
   }
 
   private blendSettings(
-    current: OptimizationSettings, 
-    target: Partial<OptimizationSettings>, 
-    factor: number
+    current: OptimizationSettings,
+    target: Partial<OptimizationSettings>,
+    factor: number,
   ): OptimizationSettings {
     const blended = { ...current };
-    
-    Object.entries(target).forEach(([key, value]) => {
-      if (typeof value === 'number' && typeof current[key as keyof OptimizationSettings] === 'number') {
-        const currentValue = current[key as keyof OptimizationSettings] as number;
-        blended[key as keyof OptimizationSettings] = currentValue + (value - currentValue) * factor as any;
-      } else if (typeof value === 'boolean') {
-        blended[key as keyof OptimizationSettings] = value as any;
+
+    for (const [key, value] of Object.entries(target) as [
+      keyof OptimizationSettings,
+      OptimizationSettings[keyof OptimizationSettings] | undefined,
+    ][]) {
+      if (
+        value !== undefined &&
+        this.isNumericSettingKey(key) &&
+        typeof value === "number"
+      ) {
+        const currentValue = current[key];
+        blended[key] = currentValue + (value - currentValue) * factor;
+      } else if (
+        value !== undefined &&
+        this.isBooleanSettingKey(key) &&
+        typeof value === "boolean"
+      ) {
+        blended[key] = value;
       }
-    });
-    
+    }
+
     return blended;
+  }
+
+  private isNumericSettingKey(
+    key: keyof OptimizationSettings,
+  ): key is NumericOptimizationSettingKey {
+    return AdaptiveQualityManager.numericSettingKeys.has(
+      key as NumericOptimizationSettingKey,
+    );
+  }
+
+  private isBooleanSettingKey(
+    key: keyof OptimizationSettings,
+  ): key is BooleanOptimizationSettingKey {
+    return AdaptiveQualityManager.booleanSettingKeys.has(
+      key as BooleanOptimizationSettingKey,
+    );
   }
 
   /**
@@ -488,24 +582,28 @@ export class AdaptiveQualityManager {
 
 /**
  * Shader Parameter Optimizer
- * 
+ *
  * Fine-tunes shader parameters for optimal visual impact and performance
  */
-export class ShaderParameterOptimizer {
+class ShaderParameterOptimizer {
   /**
    * Get optimized shader uniforms based on device capabilities and performance
    */
   public static getOptimizedUniforms(
     settings: OptimizationSettings,
-    capabilities: DeviceCapabilities
-  ): { [key: string]: any } {
-    const uniforms: { [key: string]: any } = {};
+    capabilities: DeviceCapabilities,
+  ): Record<string, number | boolean> {
+    const uniforms: Record<string, number | boolean> = {};
 
     // Particle system optimizations
-    uniforms.particleCount = Math.min(settings.particleCount, capabilities.maxFragmentUniforms / 4);
+    uniforms.particleCount = Math.min(
+      settings.particleCount,
+      capabilities.maxFragmentUniforms / 4,
+    );
     uniforms.brownianIntensity = settings.qualityLevel * 2.0;
     uniforms.enableDepthSimulation = settings.enableAdvancedEffects;
-    uniforms.enableGlowEffects = settings.enableAdvancedEffects && settings.qualityLevel > 0.7;
+    uniforms.enableGlowEffects =
+      settings.enableAdvancedEffects && settings.qualityLevel > 0.7;
 
     // Interaction system optimizations
     uniforms.interactionEnabled = settings.interactionEnabled;
@@ -519,7 +617,8 @@ export class ShaderParameterOptimizer {
     uniforms.flowingLinesCount = Math.floor(settings.qualityLevel * 15 + 5);
     uniforms.enableVoronoiPatterns = settings.qualityLevel > 0.5;
     uniforms.voronoiGridSize = settings.qualityLevel * 8 + 4;
-    uniforms.enableSpiralPatterns = settings.enableAdvancedEffects && settings.qualityLevel > 0.8;
+    uniforms.enableSpiralPatterns =
+      settings.enableAdvancedEffects && settings.qualityLevel > 0.8;
     uniforms.spiralCount = Math.floor(settings.qualityLevel * 3 + 2);
 
     // Performance and quality uniforms
@@ -539,13 +638,13 @@ export class ShaderParameterOptimizer {
     const modifications: { [key: string]: string } = {};
 
     if (workarounds.useReducedPrecision) {
-      modifications.precision = 'precision mediump float;';
+      modifications.precision = "precision mediump float;";
     } else {
-      modifications.precision = 'precision highp float;';
+      modifications.precision = "precision highp float;";
     }
 
     if (workarounds.disableFloatTextures) {
-      modifications.textureType = 'vec4';
+      modifications.textureType = "vec4";
     }
 
     return modifications;
