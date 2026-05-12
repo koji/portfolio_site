@@ -1,27 +1,40 @@
 import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 
+const RENDER_SCALE = 0.5;
+const TARGET_FPS = 30;
+const FRAME_INTERVAL = 1000 / TARGET_FPS;
+const SCROLL_RESUME_DELAY = 150;
+
 const ChaosBackground = () => {
   const mountRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!mountRef.current) return;
 
-    // Scene setup
     const scene = new THREE.Scene();
     const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
     const renderer = new THREE.WebGLRenderer({ alpha: true });
+    renderer.setPixelRatio(1);
 
     const mount = mountRef.current;
 
     const updateSize = () => {
       const width = window.innerWidth;
       const height = window.innerHeight;
-      renderer.setSize(width, height);
-      // Optimize pixel ratio for performance (max 1.5 to save GPU on high-DPI screens)
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+      renderer.setSize(
+        Math.floor(width * RENDER_SCALE),
+        Math.floor(height * RENDER_SCALE),
+        false
+      );
+      renderer.domElement.style.width = '100%';
+      renderer.domElement.style.height = '100%';
       if (material.uniforms.iResolution) {
-        material.uniforms.iResolution.value.set(width, height, 1);
+        material.uniforms.iResolution.value.set(
+          Math.floor(width * RENDER_SCALE),
+          Math.floor(height * RENDER_SCALE),
+          1
+        );
       }
     };
 
@@ -75,34 +88,33 @@ const ChaosBackground = () => {
 
       float map(vec3 p) {
           float res = 1e9;
-          
-          // Use a reduced iteration count here for performance optimization
-          for (int i = 0; i < 50; i++) {
+
+          for (int i = 0; i < 30; i++) {
               float fi = float(i);
               float time = iTime * (0.5 + fi * 0.1);
-              
+
               vec3 center = vec3(
                   sin(time + fi * 1.57),
                   cos(time * 0.8 + fi * 2.0),
-                  tan(time * 0.2 - fi * 1.0)
+                  sin(time * 0.2 - fi * 1.0) * 2.0
               ) * 2.785;
-              
+
               vec3 p_local = p - center;
-              
+
               float rot_angle = iTime * (1.0 + fi * 0.3);
               p_local.xz *= mat2(cos(rot_angle), -sin(rot_angle), sin(rot_angle), cos(rot_angle));
               p_local.xy *= mat2(cos(rot_angle*0.7), -sin(rot_angle*0.7), sin(rot_angle*0.7), cos(rot_angle*0.7));
-              
+
               float shape_dist;
-              if(i<15) {
-                  shape_dist = sdOctahedron(p_local, 0.7); 
+              if(i<10) {
+                  shape_dist = sdOctahedron(p_local, 0.7);
               } else {
                   shape_dist = sdTetrahedron(p_local, 0.3);
               }
 
               res = opSmoothUnion(res, shape_dist, 0.75);
           }
-          
+
           return res;
       }
 
@@ -127,9 +139,7 @@ const ChaosBackground = () => {
           vec3 rd = normalize(uv.x * uu + uv.y * vv + 2.0 * ww);
 
           float t = 0.0;
-          // Reduced iterations from 100 to 60 for performance; this slightly lowers ray-march detail/precision,
-          // but the visual impact is minimal for this background effect and helps maintain smooth frame rates.
-          for (int i = 0; i < 60; i++) {
+          for (int i = 0; i < 40; i++) {
               vec3 p = ro + rd * t;
               float d = map(p);
               if (d < 0.001) break;
@@ -141,15 +151,15 @@ const ChaosBackground = () => {
           if (t < 20.0) {
               vec3 p = ro + rd * t;
               vec3 n = getNormal(p);
-              
+
               vec3 c1 = 0.5 + 0.5 * cos(iTime * 0.8 + vec3(0,1,2));
               vec3 c2 = 0.5 + 0.5 * cos(iTime * 0.5 + vec3(2,0,1));
               col = mix(c1, c2, smoothstep(-1.0, 1.0, n.y));
-              
+
               float fresnel = pow(1.0 + dot(rd, n), 3.0);
               col += vec3(1.0) * fresnel * 0.5;
           }
-          
+
           fragColor = vec4(col, 1.0);
       }
 
@@ -174,17 +184,39 @@ const ChaosBackground = () => {
     updateSize();
     window.addEventListener('resize', updateSize);
 
+    let isScrolling = false;
+    let scrollTimer: ReturnType<typeof setTimeout> | null = null;
+    const handleScroll = () => {
+      isScrolling = true;
+      if (scrollTimer !== null) clearTimeout(scrollTimer);
+      scrollTimer = setTimeout(() => {
+        isScrolling = false;
+        scrollTimer = null;
+      }, SCROLL_RESUME_DELAY);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
     let animationFrameId: number;
+    let lastRenderTime = 0;
     const animate = (time: number) => {
+      animationFrameId = requestAnimationFrame(animate);
+
+      if (isScrolling) return;
+
+      const delta = time - lastRenderTime;
+      if (delta < FRAME_INTERVAL) return;
+      lastRenderTime = time - (delta % FRAME_INTERVAL);
+
       material.uniforms.iTime.value = time * 0.001;
       renderer.render(scene, camera);
-      animationFrameId = requestAnimationFrame(animate);
     };
 
     animate(0);
 
     return () => {
       window.removeEventListener('resize', updateSize);
+      window.removeEventListener('scroll', handleScroll);
+      if (scrollTimer !== null) clearTimeout(scrollTimer);
       cancelAnimationFrame(animationFrameId);
       mount.removeChild(renderer.domElement);
       geometry.dispose();
@@ -195,8 +227,7 @@ const ChaosBackground = () => {
 
   return (
     <div className="fixed inset-0 z-0 pointer-events-none">
-      <div ref={mountRef} className="absolute inset-0" />
-      {/* Semi-transparent overlay to improve text readability */}
+      <div ref={mountRef} className="absolute inset-0" style={{ willChange: 'transform' }} />
       <div className="absolute inset-0 bg-background/50" />
     </div>
   );
