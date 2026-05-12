@@ -7,11 +7,14 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Menu, X } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { ThemeToggle } from './ThemeToggle';
 
 const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -21,10 +24,14 @@ const Navigation = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const scrollToSection = (sectionId: string) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+  const navigateToSection = (sectionId: string) => {
+    if (location.pathname === '/') {
+      const element = document.getElementById(sectionId);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    } else {
+      navigate(`/#${sectionId}`);
     }
     setIsMenuOpen(false);
   };
@@ -41,7 +48,7 @@ const Navigation = () => {
           <div className="flex items-center">
             <button
               type="button"
-              onClick={() => scrollToSection('home')}
+              onClick={() => navigateToSection('home')}
               className="text-xl font-bold font-japanese hover:text-primary transition-colors"
             >
               Koji/こうじ
@@ -53,14 +60,14 @@ const Navigation = () => {
             <div className="ml-10 flex items-baseline space-x-8">
               <button
                 type="button"
-                onClick={() => scrollToSection('home')}
+                onClick={() => navigateToSection('home')}
                 className="text-foreground/80 hover:text-primary transition-colors font-medium"
               >
                 Home
               </button>
               <button
                 type="button"
-                onClick={() => scrollToSection('about')}
+                onClick={() => navigateToSection('about')}
                 className="text-foreground/80 hover:text-primary transition-colors font-medium"
               >
                 About
@@ -78,19 +85,23 @@ const Navigation = () => {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="bg-background border border-border">
                   <DropdownMenuItem
-                    onClick={() => scrollToSection('work')}
+                    onClick={() => navigateToSection('work')}
                     className="cursor-pointer hover:bg-accent"
                   >
                     Work
                   </DropdownMenuItem>
                   <DropdownMenuItem
-                    onClick={() => scrollToSection('personal')}
+                    onClick={() => navigateToSection('personal')}
                     className="cursor-pointer hover:bg-accent"
                   >
                     Personal Projects
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
+
+              <Link to="/chat" className="text-foreground/80 hover:text-primary transition-colors font-medium">
+                Chat
+              </Link>
 
               <a
                 href="https://baxin.pages.dev/"
@@ -102,7 +113,7 @@ const Navigation = () => {
               </a>
               <button
                 type="button"
-                onClick={() => scrollToSection('contact')}
+                onClick={() => navigateToSection('contact')}
                 className="text-foreground/80 hover:text-primary transition-colors font-medium"
               >
                 Contact
@@ -127,32 +138,39 @@ const Navigation = () => {
             <div className="px-2 pt-2 pb-3 space-y-1 bg-background/95 backdrop-blur-md rounded-lg mt-2">
               <button
                 type="button"
-                onClick={() => scrollToSection('home')}
+                onClick={() => navigateToSection('home')}
                 className="block px-3 py-2 text-foreground/80 hover:text-primary w-full text-left"
               >
                 Home
               </button>
               <button
                 type="button"
-                onClick={() => scrollToSection('about')}
+                onClick={() => navigateToSection('about')}
                 className="block px-3 py-2 text-foreground/80 hover:text-primary w-full text-left"
               >
                 About
               </button>
               <button
                 type="button"
-                onClick={() => scrollToSection('work')}
+                onClick={() => navigateToSection('work')}
                 className="block px-3 py-2 text-foreground/80 hover:text-primary w-full text-left"
               >
                 Work
               </button>
               <button
                 type="button"
-                onClick={() => scrollToSection('personal')}
+                onClick={() => navigateToSection('personal')}
                 className="block px-3 py-2 text-foreground/80 hover:text-primary w-full text-left"
               >
                 Personal Projects
               </button>
+              <Link
+                onClick={() => setIsMenuOpen(false)}
+                to="/chat"
+                className="block px-3 py-2 text-foreground/80 hover:text-primary"
+              >
+                Chat
+              </Link>
               <a
                 href="https://baxin.pages.dev/"
                 target="_blank"
@@ -163,7 +181,7 @@ const Navigation = () => {
               </a>
               <button
                 type="button"
-                onClick={() => scrollToSection('contact')}
+                onClick={() => navigateToSection('contact')}
                 className="block px-3 py-2 text-foreground/80 hover:text-primary w-full text-left"
               >
                 Contact

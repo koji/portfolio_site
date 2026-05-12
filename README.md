@@ -13,6 +13,7 @@ A modern, responsive portfolio website built with React and TypeScript. This pro
 - **Routing**: Client-side navigation with react-router-dom
 - **Data Visualization**: Charts and graphs with recharts
 - **Accessibility**: Built with accessibility in mind
+- **Portfolio Chat**: RAG-style chat backed by a dedicated backend and Cerebras API
 
 ## 🛠️ Tech Stack
 
@@ -33,6 +34,11 @@ cd portfolio_site
 
 # Install dependencies
 pnpm install
+
+# Install backend dependencies
+cd backend
+pnpm install
+cd ..
 ```
 
 ## 🧰 Available Scripts
@@ -40,23 +46,23 @@ pnpm install
 ```bash
 # Start development server
 bun run dev
-pnpm dev
+pnpm run dev
 
 # Build for production
 bun run build
-pnpm build
+pnpm run build
 
 # Build for development
 bun run build:dev
-pnpm build:dev
+pnpm run build:dev
 
 # Lint code
 bun run lint
-pnpm lint
+pnpm run lint
 
 # Preview production build
 bun run preview
-pnpm preview
+pnpm run preview
 ```
 
 ## 🚧 Development
@@ -64,12 +70,20 @@ pnpm preview
 1. Start the development server:
    ```bash
    bun run dev
-   pnpm dev
+   pnpm run dev
    ```
 
-2. Open your browser and visit [http://localhost:5173/](http://localhost:5173/)
+2. Start the chat backend in another terminal:
+   ```bash
+   cd backend
+   cp .env.example .env.local
+   # set CEREBRAS_API_KEY in backend/.env.local
+   bun run dev
+   ```
 
-3. Make changes to files in the `src` directory to see live updates
+4. Open your browser and visit [http://localhost:8080/](http://localhost:8080/)
+
+5. Make changes to files in the `src` directory to see live updates
 
 ## 🌐 Deployment
 
@@ -77,7 +91,7 @@ Build the project for production:
 
 ```bash
 bun run build
-pnpm build
+pnpm run build
 ```
 
 The build artifacts will be stored in the `dist/` directory, ready to be deployed to your hosting provider of choice.
