@@ -27,7 +27,6 @@ export default defineConfig(() => ({
             'react',
             'react-dom',
             'react-router-dom',
-            '@radix-ui/react-dialog',
             '@radix-ui/react-slot',
             'class-variance-authority',
             'lucide-react',
