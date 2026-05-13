@@ -1,88 +1,75 @@
-import { Footer } from '@/components/Footer';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import React from 'react';
 
 const Contact = () => {
   return (
-    <section
-      id="contact"
-      className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-t from-transparent to-muted/30"
-    >
-      <div className="max-w-4xl mx-auto">
+    <section id="contact" className="py-24 px-4 sm:px-6 lg:px-8 bg-[#F7F6F3]">
+      <div className="max-w-3xl mx-auto">
         {/* Section Header */}
-        <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6 text-shadow-md">
-            Let's <span className="text-gradient font-japanese japanese-shadow">Connect 連絡</span>
+        <div className="mb-12">
+          <h2 className="text-[48px] font-semibold text-[#37352F] tracking-[-0.5px] leading-[1.15] mb-4">
+            Let's Connect <span className="font-japanese">· 連絡</span>
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto text-shadow-sm">
-            Whether you have a project in mind, want to collaborate, or just say hello - I'd love to
+          <p className="text-[16px] text-[#787774] leading-[1.55] max-w-2xl">
+            Whether you have a project in mind, want to collaborate, or just say hello — I'd love to
             hear from you.
           </p>
         </div>
 
-        {/* Contact Card */}
-        <Card className="bg-card/50 backdrop-blur-sm border-border/50 hover:shadow-lg transition-all duration-300 animate-fade-in">
-          <CardHeader className="text-center pb-6">
-            <div className="w-20 h-20 bg-gradient-to-br from-vermilion-500 to-sakura-500 rounded-full mx-auto mb-6 flex items-center justify-center">
-              <span className="text-2xl font-japanese text-white">こ</span>
-            </div>
-            <CardTitle className="text-2xl lg:text-3xl">
-              Ready to Start Something Amazing?
-            </CardTitle>
-          </CardHeader>
+        {/* Bold Yellow Banner Card */}
+        <div className="bg-[#FFFCE5] rounded-[12px] p-10 mb-6 border border-[#E9E9E7]">
+          {/* Avatar */}
+          <div className="w-16 h-16 bg-[#7766E4] rounded-full flex items-center justify-center mb-6">
+            <span className="text-xl font-japanese text-white">こ</span>
+          </div>
 
-          <CardContent className="space-y-8">
-            {/* Email Section */}
-            <div className="text-center space-y-4">
-              <h3 className="text-xl font-semibold text-primary">Get In Touch</h3>
-              <div className="bg-muted/50 rounded-lg p-6">
-                <p className="text-muted-foreground mb-4">
-                  Drop me a line and let's discuss your next project
-                </p>
-                <a
-                  href="mailto:baxin1919@gmail.com"
-                  className="text-2xl font-medium text-primary hover:text-primary/80 transition-colors"
-                >
-                  baxin1919(at-mark)gmail.com
-                </a>
-              </div>
-            </div>
+          <h3 className="text-[28px] font-semibold text-[#37352F] leading-[1.25] mb-6">
+            Ready to Start Something Amazing?
+          </h3>
 
-            {/* Quick Actions */}
-            <div className="grid sm:grid-cols-2 gap-4">
-              <Button
-                variant="outline"
-                size="lg"
-                className="h-20 flex-col gap-2 hover:bg-accent hover:text-accent-foreground"
-                onClick={() => window.open('https://baxin.pages.dev/', '_blank')}
-              >
-                <span className="text-lg">📖</span>
-                <span>Read My Blog</span>
-              </Button>
+          {/* Email */}
+          <div className="mb-8">
+            <p className="text-sm text-[#45413C] mb-2">Drop me a line and let's discuss your next project</p>
+            <a
+              href="mailto:baxin1919@gmail.com"
+              className="text-[18px] font-medium text-[#7766E4] hover:text-[#6655D8] transition-colors"
+            >
+              baxin1919(at-mark)gmail.com
+            </a>
+          </div>
 
-              <Button
-                size="lg"
-                className="h-20 flex-col gap-2 bg-primary hover:bg-primary/90"
-                onClick={() => {
-                  window.location.href = 'mailto:baxin1919@gmail.com?subject=Hello%20Koji!';
-                }}
-              >
-                <span className="text-lg">✉️</span>
-                <span>Send Email</span>
-              </Button>
-            </div>
+          {/* Quick Actions */}
+          <div className="flex flex-col sm:flex-row gap-3">
+            <button
+              type="button"
+              className="flex-1 flex items-center justify-center gap-2 py-3 text-sm font-medium text-[#45413C] border border-[#45413C]/30 bg-transparent rounded-[8px] hover:bg-[#45413C]/10 transition-colors"
+              onClick={() => window.open('https://baxin.pages.dev/', '_blank')}
+            >
+              <span>📖</span>
+              <span>Read My Blog</span>
+            </button>
+            <button
+              type="button"
+              className="flex-1 flex items-center justify-center gap-2 py-3 text-sm font-medium text-white bg-[#7766E4] rounded-[8px] hover:bg-[#6655D8] transition-colors"
+              onClick={() => {
+                window.location.href = 'mailto:baxin1919@gmail.com?subject=Hello%20Koji!';
+              }}
+            >
+              <span>✉️</span>
+              <span>Send Email</span>
+            </button>
+          </div>
+        </div>
 
-            {/* Japanese Closing */}
-            <div className="text-center pt-8 border-t border-border/50">
-              <p className="text-lg font-japanese text-primary mb-2">ありがとうございます</p>
-              <p className="text-sm text-muted-foreground">Thank you for visiting my portfolio</p>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Japanese Closing */}
+        <div className="text-center py-4">
+          <p className="text-[18px] font-japanese text-[#37352F] mb-1">ありがとうございます</p>
+          <p className="text-sm text-[#9B9A97]">Thank you for visiting my portfolio</p>
+        </div>
 
         {/* Footer */}
-        <Footer />
+        <div className="text-center mt-10 pt-8 border-t border-[#E9E9E7]">
+          <p className="text-sm text-[#9B9A97] font-japanese">© 2025 Koji · こうじ</p>
+        </div>
       </div>
     </section>
   );

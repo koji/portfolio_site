@@ -1,7 +1,6 @@
 import type { Config } from 'tailwindcss';
 
 export default {
-  darkMode: ['class'],
   content: [
     './pages/**/*.{ts,tsx}',
     './components/**/*.{ts,tsx}',
@@ -56,42 +55,29 @@ export default {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))',
         },
-        // Japanese-inspired colors
-        vermilion: {
-          50: '#fef7f0',
-          100: '#feeee0',
-          200: '#fdd9c1',
-          300: '#fbb896',
-          400: '#f88d69',
-          500: '#f56542',
-          600: '#e64a2e',
-          700: '#c13425',
-          800: '#9f2a24',
-          900: '#812622',
-        },
-        sakura: {
-          50: '#fef7f7',
-          100: '#fdeef0',
-          200: '#fbd5da',
-          300: '#f7aab5',
-          400: '#f17591',
-          500: '#e73c7e',
-          600: '#d61355',
-          700: '#b91b47',
-          800: '#9a1b3f',
-          900: '#811a39',
-        },
-        sumi: {
-          50: '#f6f6f6',
-          100: '#e7e7e7',
-          200: '#d1d1d1',
-          300: '#b0b0b0',
-          400: '#888888',
-          500: '#6d6d6d',
-          600: '#5d5d5d',
-          700: '#4f4f4f',
-          800: '#454545',
-          900: '#3d3d3d',
+        notion: {
+          navy: '#191E2C',
+          'navy-deep': '#0F1117',
+          purple: '#7766E4',
+          'purple-pressed': '#6655D8',
+          canvas: '#FFFFFF',
+          surface: '#F7F6F3',
+          ink: '#37352F',
+          charcoal: '#45413C',
+          slate: '#787774',
+          steel: '#9B9A97',
+          hairline: '#E9E9E7',
+          tint: {
+            peach: '#FEF0E4',
+            rose: '#FDEEF0',
+            mint: '#EDFAF4',
+            lavender: '#F1EFFE',
+            sky: '#EAF4FE',
+            yellow: '#FFFCE5',
+            'yellow-bold': '#FAED6A',
+            cream: '#FFFDF8',
+            gray: '#F5F5F4',
+          },
         },
         sidebar: {
           DEFAULT: 'hsl(var(--sidebar-background))',
@@ -108,6 +94,11 @@ export default {
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)',
+        'notion-btn': '8px',
+        'notion-card': '12px',
+        'notion-feature': '16px',
+        'notion-xxl': '20px',
+        'notion-full': '9999px',
       },
       keyframes: {
         'accordion-down': {
@@ -144,21 +135,12 @@ export default {
             transform: 'translateX(0)',
           },
         },
-        float: {
-          '0%, 100%': {
-            transform: 'translateY(0px)',
-          },
-          '50%': {
-            transform: 'translateY(-10px)',
-          },
-        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
         'fade-in': 'fade-in 0.6s ease-out',
         'slide-in': 'slide-in 0.8s ease-out',
-        float: 'float 3s ease-in-out infinite',
       },
     },
   },

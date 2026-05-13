@@ -1,16 +1,25 @@
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { personalProjects } from '@/data/personalPrjData';
 import React from 'react';
 
-const statusColors = {
-  completed: 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400',
-  'in-progress': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400',
-  planned: 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400',
+const CARD_TINTS = [
+  '#FEF0E4', // peach
+  '#FDEEF0', // rose
+  '#EDFAF4', // mint
+  '#F1EFFE', // lavender
+  '#EAF4FE', // sky
+  '#FFFCE5', // yellow
+  '#FFFDF8', // cream
+  '#F5F5F4', // gray
+  '#FEF0E4', // peach again
+];
+
+const statusStyles: Record<string, { bg: string; text: string; label: string }> = {
+  completed: { bg: '#EDFAF4', text: '#2D7D52', label: 'Completed' },
+  'in-progress': { bg: '#FEF0E4', text: '#C25A1C', label: 'In Progress' },
+  planned: { bg: '#F1EFFE', text: '#5B46D9', label: 'Planned' },
 };
 
-const categoryIcons = {
+const categoryIcons: Record<string, string> = {
   web: '🌐',
   mobile: '📱',
   cli: '⌨️',
@@ -18,98 +27,101 @@ const categoryIcons = {
 };
 
 const PersonalProjects = () => {
+  const reversedProjects = [...personalProjects].reverse();
+
   return (
-    <section id="personal" className="py-20 px-4 sm:px-6 lg:px-8">
+    <section id="personal" className="py-24 px-4 sm:px-6 lg:px-8 bg-white">
       <div className="max-w-6xl mx-auto">
         {/* Section Header */}
-        <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6 text-shadow-md">
-            Personal{' '}
-            <span className="text-gradient font-japanese japanese-shadow">
-              Projects プロジェクト
-            </span>
+        <div className="mb-16">
+          <h2 className="text-[48px] font-semibold text-[#37352F] tracking-[-0.5px] leading-[1.15] mb-4">
+            Personal Projects <span className="font-japanese">· プロジェクト</span>
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto text-shadow-sm">
+          <p className="text-[16px] text-[#787774] leading-[1.55] max-w-2xl">
             Open-source projects and personal experiments exploring new technologies and ideas
           </p>
         </div>
 
         {/* Projects Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-          {[...personalProjects].reverse().map((project, index) => (
-            <Card
-              key={project.id}
-              className="bg-card/50 backdrop-blur-sm border-border/50 hover:shadow-lg transition-all duration-300 group animate-fade-in hover:scale-105"
-              style={{ animationDelay: `${index * 0.1}s` }}
-            >
-              <CardHeader className="pb-3">
-                <div className="flex items-start justify-between gap-2">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mb-16">
+          {reversedProjects.map((project, index) => {
+            const tintBg = CARD_TINTS[index % CARD_TINTS.length];
+            const status = statusStyles[project.status];
+
+            return (
+              <div
+                key={project.id}
+                className="rounded-[12px] border border-[#E9E9E7] p-6 flex flex-col"
+                style={{ backgroundColor: tintBg }}
+              >
+                {/* Card Header */}
+                <div className="flex items-start justify-between gap-2 mb-3">
                   <div className="flex items-center gap-2">
-                    <span className="text-2xl">{categoryIcons[project.category]}</span>
-                    <div>
-                      <CardTitle className="text-lg group-hover:text-primary transition-colors">
-                        {project.title}
-                      </CardTitle>
-                    </div>
+                    <span className="text-xl">{categoryIcons[project.category]}</span>
+                    <h3 className="text-[16px] font-semibold text-[#37352F] leading-[1.3]">
+                      {project.title}
+                    </h3>
                   </div>
-                  <Badge
-                    className={`w-28 flex items-center justify-center text-xs px-2 py-1 ${
-                      statusColors[project.status]
-                    } border-0`}
+                  <span
+                    className="flex-shrink-0 px-2 py-0.5 text-xs font-medium rounded-[6px] whitespace-nowrap"
+                    style={{ backgroundColor: status.bg, color: status.text }}
                   >
-                    {project.status.replace('-', ' ')}
-                  </Badge>
+                    {status.label}
+                  </span>
                 </div>
-              </CardHeader>
 
-              <CardContent className="space-y-4">
-                <CardDescription className="text-sm leading-relaxed">
+                {/* Description */}
+                <p className="text-sm text-[#45413C] leading-[1.55] mb-4 flex-1">
                   {project.description}
-                </CardDescription>
+                </p>
 
-                <div className="flex flex-wrap gap-1">
+                {/* Tech badges */}
+                <div className="flex flex-wrap gap-1.5 mb-4">
                   {project.technologies.map((tech) => (
-                    <Badge key={tech} variant="outline" className="text-xs">
+                    <span
+                      key={tech}
+                      className="px-2 py-0.5 text-xs text-[#787774] bg-white border border-[#E9E9E7] rounded-[4px]"
+                    >
                       {tech}
-                    </Badge>
+                    </span>
                   ))}
                 </div>
 
-                <div className="flex gap-2 pt-2">
+                {/* Action buttons */}
+                <div className="flex gap-2">
                   {project.githubUrl && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="text-xs flex-1"
+                    <button
+                      type="button"
+                      className="flex-1 py-1.5 text-xs font-medium text-[#37352F] bg-white border border-[#E9E9E7] rounded-[8px] hover:bg-[#F7F6F3] transition-colors"
                       onClick={() => window.open(project.githubUrl, '_blank')}
                     >
                       GitHub
-                    </Button>
+                    </button>
                   )}
                   {project.liveUrl && (
-                    <Button
-                      size="sm"
-                      className="text-xs flex-1 bg-primary hover:bg-primary/90"
+                    <button
+                      type="button"
+                      className="flex-1 py-1.5 text-xs font-medium text-white bg-[#7766E4] rounded-[8px] hover:bg-[#6655D8] transition-colors"
                       onClick={() => window.open(project.liveUrl, '_blank')}
                     >
                       Live Demo
-                    </Button>
+                    </button>
                   )}
                 </div>
-              </CardContent>
-            </Card>
-          ))}
+              </div>
+            );
+          })}
         </div>
 
         {/* Japanese Quote */}
-        <div className="text-center bg-gradient-to-r from-vermilion-50 to-sakura-50 dark:from-vermilion-950/10 dark:to-sakura-950/10 rounded-lg p-8">
-          <blockquote className="text-xl font-japanese text-primary mb-4">
+        <div className="text-center bg-[#F7F6F3] rounded-[12px] border border-[#E9E9E7] p-10">
+          <blockquote className="text-[20px] font-japanese text-[#37352F] mb-3">
             千里の道も一歩から
           </blockquote>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-[#787774]">
             "A journey of a thousand miles begins with a single step"
           </p>
-          <p className="text-xs text-muted-foreground mt-2">
+          <p className="text-xs text-[#9B9A97] mt-2">
             Every project starts with curiosity and a willingness to learn
           </p>
         </div>
