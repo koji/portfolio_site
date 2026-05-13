@@ -1,5 +1,4 @@
 import About from '@/components/About';
-import ChaosBackground from '@/components/ChaosBackground';
 import Contact from '@/components/Contact';
 import GoToTopButton from '@/components/GoToTopButton';
 import Hero from '@/components/Hero';
@@ -10,7 +9,6 @@ import React, { useEffect } from 'react';
 
 export const Index = () => {
   useEffect(() => {
-    // Smooth scrolling polyfill for older browsers
     if (!('scrollBehavior' in document.documentElement.style)) {
       import('smoothscroll-polyfill').then((smoothscroll) => {
         smoothscroll.polyfill();
@@ -19,24 +17,17 @@ export const Index = () => {
   }, []);
 
   return (
-    <div className="min-h-screen text-foreground relative">
-      {/* Shader-based Chaos Background */}
-      <ChaosBackground />
+    <div className="min-h-screen bg-notion-canvas text-notion-ink">
+      <Navigation />
 
-      {/* Content */}
-      <div className="relative z-10">
-        <Navigation />
+      <main>
+        <Hero />
+        <About />
+        <WorkProjects />
+        <PersonalProjects />
+        <Contact />
+      </main>
 
-        <main>
-          <Hero />
-          <About />
-          <WorkProjects />
-          <PersonalProjects />
-          <Contact />
-        </main>
-      </div>
-
-      {/* Go to Top Button - Positioned on the right for better accessibility */}
       <GoToTopButton
         position="bottom-right"
         showAfter={150}

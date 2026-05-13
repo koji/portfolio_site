@@ -31,7 +31,6 @@ export default defineConfig(() => ({
             'class-variance-authority',
             'lucide-react',
           ],
-          'vendor-three': ['three'],
         },
       },
     },
