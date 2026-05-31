@@ -50,7 +50,7 @@ export const workProjects: WorkProject[] = [
     description:
       'Developed an IoT hub system that was based on Home Assistant. The system allowed users to control their home devices from a web app.',
     technologies: ['React', 'TypeScript', 'Threejs', 'Nodejs', 'Python', 'Home Assistant'],
-    period: '2028 - 2020',
+    period: '2018 - 2020',
     highlights: [
       'Allowed users to control IoT devices from a 3D model viewer',
       'Space recognition that was based on an object detection',
