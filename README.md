@@ -7,7 +7,6 @@ A modern, responsive portfolio website built with React and TypeScript. This pro
 - **Responsive Design**: Looks great on all devices
 - **Modern UI Components**: Built with Radix UI primitives
 - **Interactive Elements**: Uses animations and transitions for an engaging user experience
-- **3D Graphics**: Three.js integration for advanced visual effects
 - **Dark/Light Mode**: Theme switching with next-themes
 - **Form Handling**: Robust forms with react-hook-form and zod validation
 - **Routing**: Client-side navigation with react-router-dom
@@ -24,15 +23,19 @@ A modern, responsive portfolio website built with React and TypeScript. This pro
 
 ## 📦 Installation
 
-Make sure you have [Node.js](https://nodejs.org/), [bun](https://bun.com/), and [pnpm](https://pnpm.io/) installed.
+Make sure you have [Node.js](https://nodejs.org/), [bun](https://bun.com/) or [pnpm](https://pnpm.io/) installed.
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/portfolio_site.git
+git clone https://github.com/koji/portfolio_site.git
 cd portfolio_site
 
-# Install dependencies
+# Install dependencies pnpm
 pnpm install
+
+# Install dependencies via bun
+bun install
+
 ```
 
 ## 🧰 Available Scripts
