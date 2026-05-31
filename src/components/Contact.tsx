@@ -68,7 +68,7 @@ const Contact = () => {
 
         {/* Footer */}
         <div className="text-center mt-10 pt-8 border-t border-[#E9E9E7]">
-          <p className="text-sm text-[#9B9A97] font-japanese">© 2025 Koji · こうじ</p>
+          <p className="text-sm text-[#9B9A97] font-japanese">© {new Date().getFullYear()} Koji · こうじ</p>
         </div>
       </div>
     </section>
