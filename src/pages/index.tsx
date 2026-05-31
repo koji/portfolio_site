@@ -17,10 +17,13 @@ export const Index = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-notion-canvas text-notion-ink">
-      <Navigation />
+  <div className="min-h-screen bg-notion-canvas text-notion-ink">
+  <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[100] focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:rounded focus:shadow-lg focus:text-[#37352F]">
+  Skip to content
+  </a>
+  <Navigation />
 
-      <main>
+  <main id="main-content">
         <Hero />
         <About />
         <WorkProjects />
