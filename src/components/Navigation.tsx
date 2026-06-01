@@ -12,12 +12,17 @@ const Navigation = () => {
  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, sectionId: string) => {
- e.preventDefault();
- const element = document.getElementById(sectionId);
- if (element) {
- element.scrollIntoView({ behavior: 'smooth' });
- }
- setIsMenuOpen(false);
+  if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.altKey || e.ctrlKey || e.shiftKey) {
+   return;
+  }
+
+  e.preventDefault();
+  const element = document.getElementById(sectionId);
+  if (element) {
+   window.history.pushState(null, '', `#${sectionId}`);
+   element.scrollIntoView({ behavior: 'smooth' });
+  }
+  setIsMenuOpen(false);
  };
 
  return (
