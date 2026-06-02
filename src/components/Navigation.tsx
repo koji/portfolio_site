@@ -73,16 +73,14 @@ const Navigation = () => {
             Work
           </a>
         </DropdownMenuItem>
- <DropdownMenuItem
- onClick={() => {
- const el = document.getElementById('personal');
- if (el) el.scrollIntoView({ behavior: 'smooth' });
- setIsMenuOpen(false);
- }}
- className="cursor-pointer text-sm text-[#37352F] hover:bg-[#F7F6F3]"
- >
- Personal Projects
- </DropdownMenuItem>
+        <DropdownMenuItem
+          asChild
+          className="cursor-pointer text-sm text-[#37352F] hover:bg-[#F7F6F3]"
+        >
+          <a href="#personal" onClick={(e) => handleNavClick(e, 'personal')}>
+            Personal Projects
+          </a>
+        </DropdownMenuItem>
  </DropdownMenuContent>
  </DropdownMenu>
 
