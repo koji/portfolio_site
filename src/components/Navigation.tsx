@@ -65,16 +65,14 @@ const Navigation = () => {
  </button>
  </DropdownMenuTrigger>
  <DropdownMenuContent className="bg-white border border-[#E9E9E7] shadow-notion-card rounded-[8px]">
- <DropdownMenuItem
- onClick={() => {
- const el = document.getElementById('work');
- if (el) el.scrollIntoView({ behavior: 'smooth' });
- setIsMenuOpen(false);
- }}
- className="cursor-pointer text-sm text-[#37352F] hover:bg-[#F7F6F3]"
- >
- Work
- </DropdownMenuItem>
+        <DropdownMenuItem
+          asChild
+          className="cursor-pointer text-sm text-[#37352F] hover:bg-[#F7F6F3]"
+        >
+          <a href="#work" onClick={(e) => handleNavClick(e, 'work')}>
+            Work
+          </a>
+        </DropdownMenuItem>
  <DropdownMenuItem
  onClick={() => {
  const el = document.getElementById('personal');
