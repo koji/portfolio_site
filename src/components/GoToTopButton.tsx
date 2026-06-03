@@ -1,31 +1,32 @@
-import { ChevronUp } from 'lucide-react';
-import { useCallback, useEffect, useState } from 'react';
-import type { FC } from 'react';
+import { ChevronUp } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+import type { FC, CSSProperties, KeyboardEvent } from "react";
 
 interface GoToTopButtonProps {
   className?: string;
   showAfter?: number; // Show button after scrolling this many pixels
   smoothScroll?: boolean;
   showScrollProgress?: boolean; // Show scroll progress indicator
-  position?: 'bottom-right' | 'bottom-left' | 'bottom-center'; // Button position
+  position?: "bottom-right" | "bottom-left" | "bottom-center"; // Button position
 }
 
 const GoToTopButton: FC<GoToTopButtonProps> = ({
-  className = '',
+  className = "",
   showAfter = 150, // Show after scrolling just 150px
   smoothScroll = true,
   showScrollProgress = true,
-  position = 'bottom-right',
+  position = "bottom-right",
 }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
 
   const updateScrollState = useCallback(() => {
     // Check if we're in a browser environment
-    if (typeof window === 'undefined') return;
+    if (typeof window === "undefined") return;
 
     const scrollTop = window.pageYOffset;
-    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const docHeight =
+      document.documentElement.scrollHeight - window.innerHeight;
     const scrollPercent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
 
     // Show button after scrolling past threshold and keep it visible
@@ -51,14 +52,14 @@ const GoToTopButton: FC<GoToTopButtonProps> = ({
     };
 
     // Add scroll event listener
-    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener("scroll", handleScroll, { passive: true });
 
     // Initial check
     updateScrollState();
 
     // Cleanup
     return () => {
-      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener("scroll", handleScroll);
       if (animationFrameId !== null) {
         cancelAnimationFrame(animationFrameId);
       }
@@ -67,26 +68,26 @@ const GoToTopButton: FC<GoToTopButtonProps> = ({
 
   const scrollToTop = () => {
     // Check if we're in a browser environment
-    if (typeof window === 'undefined') return;
+    if (typeof window === "undefined") return;
 
     if (smoothScroll) {
       window.scrollTo({
         top: 0,
-        behavior: 'smooth',
+        behavior: "smooth",
       });
     } else {
       window.scrollTo(0, 0);
     }
 
     // Focus management for accessibility
-    const mainContent = document.querySelector('main');
+    const mainContent = document.querySelector("main");
     if (mainContent) {
       mainContent.focus();
     }
   };
 
-  const handleKeyDown = (event: React.KeyboardEvent) => {
-    if (event.key === 'Enter' || event.key === ' ') {
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
       scrollToTop();
     }
@@ -98,20 +99,20 @@ const GoToTopButton: FC<GoToTopButtonProps> = ({
   }
 
   // Inline styles as fallback to ensure proper positioning
-  const getInlineStyles = (): React.CSSProperties => {
-    const baseStyles: React.CSSProperties = {
-      position: 'fixed',
+  const getInlineStyles = (): CSSProperties => {
+    const baseStyles: CSSProperties = {
+      position: "fixed",
       zIndex: 50,
-      bottom: '1.5rem',
+      bottom: "1.5rem",
     };
 
     switch (position) {
-      case 'bottom-left':
-        return { ...baseStyles, left: '1.5rem' };
-      case 'bottom-center':
-        return { ...baseStyles, left: '50%', transform: 'translateX(-50%)' };
+      case "bottom-left":
+        return { ...baseStyles, left: "1.5rem" };
+      case "bottom-center":
+        return { ...baseStyles, left: "50%", transform: "translateX(-50%)" };
       default:
-        return { ...baseStyles, right: '1.5rem' };
+        return { ...baseStyles, right: "1.5rem" };
     }
   };
 
