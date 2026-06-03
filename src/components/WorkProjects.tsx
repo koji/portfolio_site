@@ -24,7 +24,10 @@ export const WorkProjects = () => {
         {/* Projects */}
         <div className="space-y-6">
           {workProjects.map((project) => {
-            const tint = companyTints[project.company] ?? { bg: '#F5F5F4', text: '#787774' };
+            const tint = companyTints[project.company] ?? {
+              bg: '#F5F5F4',
+              text: '#787774',
+            };
             return (
               <div
                 key={project.id}

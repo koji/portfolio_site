@@ -1,5 +1,6 @@
 import { ChevronUp } from 'lucide-react';
-import React, { useState, useEffect, useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import type { FC } from 'react';
 
 interface GoToTopButtonProps {
   className?: string;
@@ -9,7 +10,7 @@ interface GoToTopButtonProps {
   position?: 'bottom-right' | 'bottom-left' | 'bottom-center'; // Button position
 }
 
-const GoToTopButton: React.FC<GoToTopButtonProps> = ({
+const GoToTopButton: FC<GoToTopButtonProps> = ({
   className = '',
   showAfter = 150, // Show after scrolling just 150px
   smoothScroll = true,
