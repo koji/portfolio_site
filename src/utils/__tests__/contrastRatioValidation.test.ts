@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 // Utility function to calculate relative luminance
 function getRelativeLuminance(r: number, g: number, b: number): number {
@@ -8,16 +8,19 @@ function getRelativeLuminance(r: number, g: number, b: number): number {
   const bsRGB = b / 255;
 
   // Apply gamma correction
-  const rLinear = rsRGB <= 0.03928 ? rsRGB / 12.92 : Math.pow((rsRGB + 0.055) / 1.055, 2.4);
-  const gLinear = gsRGB <= 0.03928 ? gsRGB / 12.92 : Math.pow((gsRGB + 0.055) / 1.055, 2.4);
-  const bLinear = bsRGB <= 0.03928 ? bsRGB / 12.92 : Math.pow((bsRGB + 0.055) / 1.055, 2.4);
+  const rLinear = rsRGB <= 0.03928 ? rsRGB / 12.92 : ((rsRGB + 0.055) / 1.055) ** 2.4;
+  const gLinear = gsRGB <= 0.03928 ? gsRGB / 12.92 : ((gsRGB + 0.055) / 1.055) ** 2.4;
+  const bLinear = bsRGB <= 0.03928 ? bsRGB / 12.92 : ((bsRGB + 0.055) / 1.055) ** 2.4;
 
   // Calculate relative luminance
   return 0.2126 * rLinear + 0.7152 * gLinear + 0.0722 * bLinear;
 }
 
 // Utility function to calculate contrast ratio between two colors
-function getContrastRatio(color1: [number, number, number], color2: [number, number, number]): number {
+function getContrastRatio(
+  color1: [number, number, number],
+  color2: [number, number, number]
+): number {
   const l1 = getRelativeLuminance(color1[0], color1[1], color1[2]);
   const l2 = getRelativeLuminance(color2[0], color2[1], color2[2]);
 
@@ -71,7 +74,7 @@ describe('Contrast Ratio Validation for Accessibility', () => {
         THEME_COLORS.light.particle,
         THEME_COLORS.light.background
       );
-      
+
       // Particles should have enough contrast to be visible but not too much to interfere
       expect(particleBackgroundContrast).toBeGreaterThan(2.0);
       expect(particleBackgroundContrast).toBeLessThan(8.0);
@@ -82,7 +85,7 @@ describe('Contrast Ratio Validation for Accessibility', () => {
         THEME_COLORS.dark.particle,
         THEME_COLORS.dark.background
       );
-      
+
       // Particles should have enough contrast to be visible but not too much to interfere
       expect(particleBackgroundContrast).toBeGreaterThan(2.0);
       expect(particleBackgroundContrast).toBeLessThan(10.0);
@@ -109,7 +112,7 @@ describe('Contrast Ratio Validation for Accessibility', () => {
         THEME_COLORS.light.background
       );
       expect(lightPrimaryContrast).toBeGreaterThan(3.0); // Should be visible but not overwhelming
-      
+
       // Dark theme primary on dark background
       const darkPrimaryContrast = getContrastRatio(
         THEME_COLORS.dark.primary,
@@ -125,7 +128,7 @@ describe('Contrast Ratio Validation for Accessibility', () => {
         THEME_COLORS.light.background
       );
       expect(lightAccentContrast).toBeGreaterThan(3.0);
-      
+
       // Dark theme accent on dark background
       const darkAccentContrast = getContrastRatio(
         THEME_COLORS.dark.accent,
@@ -137,12 +140,12 @@ describe('Contrast Ratio Validation for Accessibility', () => {
     it('should ensure shader colors do not create accessibility barriers', () => {
       // Test that shader colors are distinguishable for color-blind users
       // This is a simplified test - in practice, you'd use more sophisticated color vision simulation
-      
+
       const primaryAccentContrast = getContrastRatio(
         THEME_COLORS.light.primary,
         THEME_COLORS.light.accent
       );
-      
+
       // Primary and accent should be distinguishable
       expect(primaryAccentContrast).toBeGreaterThan(1.2);
     });
@@ -152,7 +155,7 @@ describe('Contrast Ratio Validation for Accessibility', () => {
     it('should calculate appropriate opacity for static fallback', () => {
       const baseIntensity = 0.8;
       const reducedIntensity = baseIntensity * 0.3; // As implemented in the component
-      
+
       // Reduced intensity should be subtle enough not to interfere with content
       expect(reducedIntensity).toBeLessThanOrEqual(0.3);
       expect(reducedIntensity).toBeGreaterThan(0.1); // But still visible
@@ -161,7 +164,7 @@ describe('Contrast Ratio Validation for Accessibility', () => {
     it('should ensure static fallback maintains sufficient contrast', () => {
       // Test that even with reduced intensity, the static version maintains readability
       const staticIntensity = 0.3; // Maximum intensity for static fallback
-      
+
       // With screen blend mode, the effective contrast should still be acceptable
       // This is a simplified test - actual blend mode calculations are more complex
       expect(staticIntensity).toBeLessThan(0.5); // Should not interfere significantly with text
@@ -173,36 +176,30 @@ describe('Contrast Ratio Validation for Accessibility', () => {
       // Simplified test for red color blindness
       // In protanopia, red appears much darker
       const simulatedRed = [85, 102, 66] as [number, number, number]; // Simulated vermilion for protanopia
-      
-      const contrastWithBackground = getContrastRatio(
-        simulatedRed,
-        THEME_COLORS.light.background
-      );
-      
+
+      const contrastWithBackground = getContrastRatio(simulatedRed, THEME_COLORS.light.background);
+
       expect(contrastWithBackground).toBeGreaterThan(2.0); // Should still be visible
     });
 
     it('should provide sufficient contrast for deuteranopia (green-blind)', () => {
       // Simplified test for green color blindness
       const simulatedGreen = [102, 85, 66] as [number, number, number]; // Simulated color for deuteranopia
-      
+
       const contrastWithBackground = getContrastRatio(
         simulatedGreen,
         THEME_COLORS.light.background
       );
-      
+
       expect(contrastWithBackground).toBeGreaterThan(2.0);
     });
 
     it('should provide sufficient contrast for tritanopia (blue-blind)', () => {
       // Simplified test for blue color blindness
       const simulatedBlue = [245, 102, 85] as [number, number, number]; // Simulated color for tritanopia
-      
-      const contrastWithBackground = getContrastRatio(
-        simulatedBlue,
-        THEME_COLORS.light.background
-      );
-      
+
+      const contrastWithBackground = getContrastRatio(simulatedBlue, THEME_COLORS.light.background);
+
       expect(contrastWithBackground).toBeGreaterThan(2.0);
     });
   });
@@ -212,7 +209,7 @@ describe('Contrast Ratio Validation for Accessibility', () => {
       // Test with known values
       const whiteLuminance = getRelativeLuminance(255, 255, 255);
       const blackLuminance = getRelativeLuminance(0, 0, 0);
-      
+
       expect(whiteLuminance).toBeCloseTo(1.0, 2);
       expect(blackLuminance).toBeCloseTo(0.0, 2);
     });
@@ -221,7 +218,7 @@ describe('Contrast Ratio Validation for Accessibility', () => {
       // Test with known values
       const whiteBlackContrast = getContrastRatio([255, 255, 255], [0, 0, 0]);
       expect(whiteBlackContrast).toBeCloseTo(21, 0);
-      
+
       const sameColorContrast = getContrastRatio([128, 128, 128], [128, 128, 128]);
       expect(sameColorContrast).toBeCloseTo(1, 1);
     });

@@ -1,15 +1,15 @@
 /**
  * Performance Optimization Tests
- * 
+ *
  * Tests for the performance optimization utilities
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { 
-  PerformanceMonitor, 
-  DeviceCapabilityDetector, 
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import {
   AdaptiveQualityManager,
-  CrossBrowserCompatibility 
+  CrossBrowserCompatibility,
+  DeviceCapabilityDetector,
+  PerformanceMonitor,
 } from '../performanceOptimization';
 
 describe('Performance Optimization', () => {
@@ -25,7 +25,7 @@ describe('Performance Optimization', () => {
     it('should detect device capabilities', () => {
       const detector = new DeviceCapabilityDetector();
       const capabilities = detector.detectCapabilities();
-      
+
       expect(capabilities).toBeDefined();
       expect(capabilities.webglVersion).toBeGreaterThanOrEqual(0);
       expect(capabilities.maxTextureSize).toBeGreaterThanOrEqual(0);
@@ -36,7 +36,7 @@ describe('Performance Optimization', () => {
     it('should provide recommended settings', () => {
       const detector = new DeviceCapabilityDetector();
       const settings = detector.getRecommendedSettings();
-      
+
       expect(settings).toBeDefined();
       expect(settings.particleCount).toBeGreaterThan(0);
       expect(settings.renderScale).toBeGreaterThan(0);
@@ -49,38 +49,38 @@ describe('Performance Optimization', () => {
     it('should initialize with default metrics', () => {
       const monitor = new PerformanceMonitor();
       const metrics = monitor.metrics;
-      
+
       expect(metrics.frameRate).toBe(60);
       expect(metrics.frameTime).toBe(16.67);
       expect(metrics.memoryUsage).toBe(0);
-      
+
       monitor.dispose();
     });
 
     it('should update frame metrics', () => {
       const monitor = new PerformanceMonitor();
-      
+
       monitor.updateFrame(0);
       monitor.updateFrame(16.67);
       monitor.updateFrame(33.33);
-      
+
       const metrics = monitor.metrics;
       expect(metrics.frameRate).toBeGreaterThan(0);
       expect(metrics.frameTime).toBeGreaterThan(0);
-      
+
       monitor.dispose();
     });
 
     it('should provide optimization recommendations', () => {
       const monitor = new PerformanceMonitor();
-      
+
       // Simulate poor performance
       monitor.updateFrame(0);
       monitor.updateFrame(100); // 10 FPS
-      
+
       const recommendations = monitor.getOptimizationRecommendations();
       expect(recommendations).toBeDefined();
-      
+
       monitor.dispose();
     });
   });
@@ -89,24 +89,24 @@ describe('Performance Optimization', () => {
     it('should initialize with device-appropriate settings', () => {
       const manager = new AdaptiveQualityManager();
       const settings = manager.getSettings();
-      
+
       expect(settings).toBeDefined();
       expect(settings.particleCount).toBeGreaterThan(0);
       expect(settings.qualityLevel).toBeGreaterThanOrEqual(0);
       expect(settings.qualityLevel).toBeLessThanOrEqual(1);
-      
+
       manager.dispose();
     });
 
     it('should update quality based on performance', () => {
       const manager = new AdaptiveQualityManager();
-      
-      const initialSettings = manager.getSettings();
+
+      const _initialSettings = manager.getSettings();
       const updatedSettings = manager.updateQuality(16.67);
-      
+
       expect(updatedSettings).toBeDefined();
       expect(updatedSettings.particleCount).toBeGreaterThan(0);
-      
+
       manager.dispose();
     });
   });

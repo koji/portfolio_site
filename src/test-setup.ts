@@ -10,13 +10,13 @@ const mockWebGLContext = {
   drawingBufferHeight: 1080,
   getExtension: (name) => {
     const extensions = {
-      'WEBGL_debug_renderer_info': {
+      WEBGL_debug_renderer_info: {
         UNMASKED_VENDOR_WEBGL: 37445,
         UNMASKED_RENDERER_WEBGL: 37446,
       },
-      'OES_texture_float': {},
-      'OES_texture_half_float': {},
-      'WEBGL_lose_context': {
+      OES_texture_float: {},
+      OES_texture_half_float: {},
+      WEBGL_lose_context: {
         loseContext: () => {},
         restoreContext: () => {},
       },
@@ -83,7 +83,7 @@ const mockWebGLContext = {
 };
 
 // Mock HTMLCanvasElement.getContext
-HTMLCanvasElement.prototype.getContext = function(contextId: string) {
+HTMLCanvasElement.prototype.getContext = (contextId: string) => {
   if (contextId === 'webgl' || contextId === 'experimental-webgl' || contextId === 'webgl2') {
     return mockWebGLContext;
   }
@@ -108,7 +108,6 @@ global.ResizeObserver = class ResizeObserver {
 
 // Mock IntersectionObserver
 global.IntersectionObserver = class IntersectionObserver {
-  constructor() {}
   observe() {}
   unobserve() {}
   disconnect() {}

@@ -12,7 +12,9 @@ const WorkspaceMockup = () => (
     <div className="grid grid-cols-[1fr_auto_auto] gap-4 px-5 py-2.5 bg-[#F7F6F3] border-b border-[#E9E9E7]">
       <span className="text-xs font-medium text-[#9B9A97] uppercase tracking-wide">Project</span>
       <span className="text-xs font-medium text-[#9B9A97] uppercase tracking-wide">Status</span>
-      <span className="text-xs font-medium text-[#9B9A97] uppercase tracking-wide hidden sm:block">Stack</span>
+      <span className="text-xs font-medium text-[#9B9A97] uppercase tracking-wide hidden sm:block">
+        Stack
+      </span>
     </div>
 
     {/* Rows */}
@@ -23,7 +25,9 @@ const WorkspaceMockup = () => (
           ● Active
         </span>
         <div className="hidden sm:flex gap-1.5">
-          <span className="px-2 py-0.5 text-xs bg-[#EAF4FE] text-[#1A6FAD] rounded-[4px]">React</span>
+          <span className="px-2 py-0.5 text-xs bg-[#EAF4FE] text-[#1A6FAD] rounded-[4px]">
+            React
+          </span>
           <span className="px-2 py-0.5 text-xs bg-[#F1EFFE] text-[#5B46D9] rounded-[4px]">TS</span>
         </div>
       </div>
@@ -34,8 +38,12 @@ const WorkspaceMockup = () => (
           ● 2024
         </span>
         <div className="hidden sm:flex gap-1.5">
-          <span className="px-2 py-0.5 text-xs bg-[#EAF4FE] text-[#1A6FAD] rounded-[4px]">React</span>
-          <span className="px-2 py-0.5 text-xs bg-[#EDFAF4] text-[#2D7D52] rounded-[4px]">Jotai</span>
+          <span className="px-2 py-0.5 text-xs bg-[#EAF4FE] text-[#1A6FAD] rounded-[4px]">
+            React
+          </span>
+          <span className="px-2 py-0.5 text-xs bg-[#EDFAF4] text-[#2D7D52] rounded-[4px]">
+            Jotai
+          </span>
         </div>
       </div>
 
@@ -45,8 +53,12 @@ const WorkspaceMockup = () => (
           ● 2020
         </span>
         <div className="hidden sm:flex gap-1.5">
-          <span className="px-2 py-0.5 text-xs bg-[#F1EFFE] text-[#5B46D9] rounded-[4px]">Three.js</span>
-          <span className="px-2 py-0.5 text-xs bg-[#FDEEF0] text-[#C53B5A] rounded-[4px]">Python</span>
+          <span className="px-2 py-0.5 text-xs bg-[#F1EFFE] text-[#5B46D9] rounded-[4px]">
+            Three.js
+          </span>
+          <span className="px-2 py-0.5 text-xs bg-[#FDEEF0] text-[#C53B5A] rounded-[4px]">
+            Python
+          </span>
         </div>
       </div>
     </div>
@@ -72,10 +84,7 @@ const Hero = () => {
   };
 
   return (
-    <section
-      id="home"
-      className="relative overflow-hidden bg-[#191E2C] pt-16"
-    >
+    <section id="home" className="relative overflow-hidden bg-[#191E2C] pt-16">
       {/* Decorative colored dots */}
       <div className="absolute top-24 left-12 w-3 h-3 rounded-full bg-[#FEF0E4] opacity-80" />
       <div className="absolute top-40 left-32 w-2 h-2 rounded-full bg-[#FAED6A] opacity-70" />
@@ -87,9 +96,7 @@ const Hero = () => {
       {/* Main Content */}
       <div className="relative z-10 text-center px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto pt-24 pb-16">
         {/* Japanese Greeting */}
-        <p className="text-white/65 font-japanese text-lg mb-3 animate-fade-in">
-          こんにちは
-        </p>
+        <p className="text-white/65 font-japanese text-lg mb-3 animate-fade-in">こんにちは</p>
 
         {/* Main Heading */}
         <h1
@@ -112,8 +119,8 @@ const Hero = () => {
           className="text-[16px] text-white/60 max-w-xl mx-auto leading-[1.6] mb-10 animate-fade-in"
           style={{ animationDelay: '0.35s' }}
         >
-          Building digital experiences with modern web technologies, open-source
-          contributions, and a passion for clean, accessible design.
+          Building digital experiences with modern web technologies, open-source contributions, and
+          a passion for clean, accessible design.
         </p>
 
         {/* CTA Buttons */}
@@ -141,10 +148,7 @@ const Hero = () => {
         </div>
 
         {/* Workspace Mockup Card */}
-        <div
-          className="animate-fade-in"
-          style={{ animationDelay: '0.55s' }}
-        >
+        <div className="animate-fade-in" style={{ animationDelay: '0.55s' }}>
           <WorkspaceMockup />
         </div>
       </div>

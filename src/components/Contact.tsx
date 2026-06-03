@@ -28,7 +28,9 @@ const Contact = () => {
 
           {/* Email */}
           <div className="mb-8">
-            <p className="text-sm text-[#45413C] mb-2">Drop me a line and let's discuss your next project</p>
+            <p className="text-sm text-[#45413C] mb-2">
+              Drop me a line and let's discuss your next project
+            </p>
             <a
               href="mailto:baxin1919@gmail.com"
               className="text-[18px] font-medium text-[#7766E4] hover:text-[#6655D8] transition-colors"
@@ -68,7 +70,9 @@ const Contact = () => {
 
         {/* Footer */}
         <div className="text-center mt-10 pt-8 border-t border-[#E9E9E7]">
-          <p className="text-sm text-[#9B9A97] font-japanese">© {new Date().getFullYear()} Koji · こうじ</p>
+          <p className="text-sm text-[#9B9A97] font-japanese">
+            © {new Date().getFullYear()} Koji · こうじ
+          </p>
         </div>
       </div>
     </section>

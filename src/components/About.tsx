@@ -25,8 +25,8 @@ const About = () => {
               </h3>
               <p className="text-[15px] text-[#45413C] leading-[1.6] mb-4">
                 My passion for development started with curiosity about how things work behind the
-                scenes. I specialize in modern web technologies, creating applications that are
-                both functional and beautiful.
+                scenes. I specialize in modern web technologies, creating applications that are both
+                functional and beautiful.
               </p>
               <p className="text-[15px] text-[#45413C] leading-[1.6]">
                 I believe in writing clean, maintainable code and contributing to open-source
