@@ -8,7 +8,7 @@ const About = () => {
         {/* Section Header */}
         <div className="mb-16">
           <h2 className="text-[48px] font-semibold text-[#37352F] tracking-[-0.5px] leading-[1.15] mb-4">
-            About <span className="font-japanese">· 私について</span>
+            About me<span className="font-japanese">· 私について</span>
           </h2>
           <p className="text-[16px] text-[#787774] leading-[1.55] max-w-2xl">
             Developer, creator, and lifelong learner passionate about building meaningful digital
