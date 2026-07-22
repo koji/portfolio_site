@@ -306,4 +306,14 @@ export const personalProjects: PersonalProject[] = [
     status: 'in-progress',
     category: 'chrome-extension',
   },
+  {
+    id: 'oss-11',
+    title: 'hakoniwa-term',
+    description:'A programmable, retro hacker-style terminal UI component for React applications with complete style isolation.',
+    technologies: ['react', 'typescript', 'pnpm', 'npm package', 'web'],
+    liveUrl: 'https://www.npmjs.com/package/hakoniwa-term',
+    githubUrl: 'https://github.com/koji/hakoniwa-term',
+    status: 'in-progress',
+    category: 'library',
+  },
 ];
