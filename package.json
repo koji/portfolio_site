@@ -30,8 +30,7 @@
     "smoothscroll-polyfill": "^0.4.4",
     "sonner": "^1.5.0",
     "tailwind-merge": "^2.5.2",
-    "tailwindcss-animate": "^1.0.7",
-    "three": "^0.158.0"
+    "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
     "@biomejs/biome": "1.5.3",
