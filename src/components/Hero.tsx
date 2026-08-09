@@ -19,45 +19,79 @@ const WorkspaceMockup = () => (
 
     {/* Rows */}
     <div className="divide-y divide-[#E9E9E7]">
+      {/* Row 1: Opentrons App */}
       <div className="grid grid-cols-[1fr_auto_auto] gap-4 items-center px-5 py-3">
         <span className="text-sm text-[#37352F] font-medium">Opentrons App</span>
         <span className="px-2 py-0.5 text-xs font-medium bg-[#EDFAF4] text-[#2D7D52] rounded-[4px] whitespace-nowrap">
           ● Active
         </span>
-        <div className="hidden sm:flex gap-1.5">
+        <div className="hidden sm:flex gap-1.5 flex-wrap">
           <span className="px-2 py-0.5 text-xs bg-[#EAF4FE] text-[#1A6FAD] rounded-[4px]">
             React
           </span>
           <span className="px-2 py-0.5 text-xs bg-[#F1EFFE] text-[#5B46D9] rounded-[4px]">TS</span>
+          <span className="px-2 py-0.5 text-xs bg-[#F1EFFE] text-[#5B46D9] rounded-[4px]">
+            Redux
+          </span>
+          <span className="px-2 py-0.5 text-xs bg-[#EDFAF4] text-[#2D7D52] rounded-[4px]">Electron</span>
+          <span className="px-2 py-0.5 text-xs bg-[#FDEEF0] text-[#C53B5A] rounded-[4px]">
+            Vite
+          </span>
+          <span className="px-2 py-0.5 text-xs bg-[#F1EFFE] text-[#5B46D9] rounded-[4px]">
+            CSS Modules
+          </span>
         </div>
       </div>
 
+      {/* Row 2: Opentrons AI */}
       <div className="grid grid-cols-[1fr_auto_auto] gap-4 items-center px-5 py-3">
-        <span className="text-sm text-[#37352F] font-medium">AI Prototype</span>
-        <span className="px-2 py-0.5 text-xs font-medium bg-[#FFFCE5] text-[#B5530C] rounded-[4px] whitespace-nowrap">
-          ● 2024
+        <span className="text-sm text-[#37352F] font-medium">Opentrons AI</span>
+        <span className="px-2 py-0.5 text-xs font-medium bg-[#EDFAF4] text-[#2D7D52] rounded-[4px] whitespace-nowrap">
+          ● Active
         </span>
-        <div className="hidden sm:flex gap-1.5">
+        <div className="hidden sm:flex gap-1.5 flex-wrap">
+          <span className="px-2 py-0.5 text-xs bg-[#F1EFFE] text-[#5B46D9] rounded-[4px]">TS</span>
           <span className="px-2 py-0.5 text-xs bg-[#EAF4FE] text-[#1A6FAD] rounded-[4px]">
             React
           </span>
           <span className="px-2 py-0.5 text-xs bg-[#EDFAF4] text-[#2D7D52] rounded-[4px]">
-            Jotai
+            Zustand
+          </span>
+          <span className="px-2 py-0.5 text-xs bg-[#FDEEF0] text-[#C53B5A] rounded-[4px]">
+            Vite
+          </span>
+          <span className="px-2 py-0.5 text-xs bg-[#F1EFFE] text-[#5B46D9] rounded-[4px]">
+            CSS Modules
           </span>
         </div>
       </div>
 
+      {/* Row 3: IoT Hub System */}
       <div className="grid grid-cols-[1fr_auto_auto] gap-4 items-center px-5 py-3">
         <span className="text-sm text-[#37352F] font-medium">IoT Hub System</span>
         <span className="px-2 py-0.5 text-xs font-medium bg-[#FEF0E4] text-[#C25A1C] rounded-[4px] whitespace-nowrap">
           ● 2020
         </span>
-        <div className="hidden sm:flex gap-1.5">
+        <div className="hidden sm:flex gap-1.5 flex-wrap">
+          <span className="px-2 py-0.5 text-xs bg-[#FDEEF0] text-[#C53B5A] rounded-[4px]">
+            Webpack
+          </span>
+          <span className="px-2 py-0.5 text-xs bg-[#F1EFFE] text-[#5B46D9] rounded-[4px]">TS</span>
+          <span className="px-2 py-0.5 text-xs bg-[#EAF4FE] text-[#1A6FAD] rounded-[4px]">
+            React
+          </span>
+          {/* Redux を追加 */}
+          <span className="px-2 py-0.5 text-xs bg-[#F1EFFE] text-[#5B46D9] rounded-[4px]">
+            Redux
+          </span>
           <span className="px-2 py-0.5 text-xs bg-[#F1EFFE] text-[#5B46D9] rounded-[4px]">
             Three.js
           </span>
           <span className="px-2 py-0.5 text-xs bg-[#FDEEF0] text-[#C53B5A] rounded-[4px]">
             Python
+          </span>
+          <span className="px-2 py-0.5 text-xs bg-[#FDEEF0] text-[#C53B5A] rounded-[4px]">
+            styled-components
           </span>
         </div>
       </div>
@@ -65,7 +99,7 @@ const WorkspaceMockup = () => (
 
     {/* Footer row */}
     <div className="px-5 py-3 border-t border-[#E9E9E7] flex flex-wrap gap-2">
-      {['React', 'TypeScript', 'Node.js', 'Python', 'Three.js'].map((tech) => (
+      {['React', 'TypeScript', 'Redux', 'Node.js', 'Python', 'Three.js', 'styled-components', 'CSS Modules'].map((tech) => (
         <span
           key={tech}
           className="px-2 py-0.5 text-xs text-[#787774] border border-[#E9E9E7] rounded-[4px] bg-white"
