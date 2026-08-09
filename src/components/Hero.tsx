@@ -30,11 +30,13 @@ const WorkspaceMockup = () => (
             React
           </span>
           <span className="px-2 py-0.5 text-xs bg-[#F1EFFE] text-[#5B46D9] rounded-[4px]">TS</span>
+          <span className="px-2 py-0.5 text-xs bg-[#F1EFFE] text-[#5B46D9] rounded-[4px]">
+            Redux
+          </span>
           <span className="px-2 py-0.5 text-xs bg-[#EDFAF4] text-[#2D7D52] rounded-[4px]">Electron</span>
           <span className="px-2 py-0.5 text-xs bg-[#FDEEF0] text-[#C53B5A] rounded-[4px]">
             Vite
           </span>
-          {/* CSS Modules を追加 */}
           <span className="px-2 py-0.5 text-xs bg-[#F1EFFE] text-[#5B46D9] rounded-[4px]">
             CSS Modules
           </span>
@@ -58,7 +60,6 @@ const WorkspaceMockup = () => (
           <span className="px-2 py-0.5 text-xs bg-[#FDEEF0] text-[#C53B5A] rounded-[4px]">
             Vite
           </span>
-          {/* CSS Modules を追加 */}
           <span className="px-2 py-0.5 text-xs bg-[#F1EFFE] text-[#5B46D9] rounded-[4px]">
             CSS Modules
           </span>
@@ -79,13 +80,16 @@ const WorkspaceMockup = () => (
           <span className="px-2 py-0.5 text-xs bg-[#EAF4FE] text-[#1A6FAD] rounded-[4px]">
             React
           </span>
+          {/* Redux を追加 */}
+          <span className="px-2 py-0.5 text-xs bg-[#F1EFFE] text-[#5B46D9] rounded-[4px]">
+            Redux
+          </span>
           <span className="px-2 py-0.5 text-xs bg-[#F1EFFE] text-[#5B46D9] rounded-[4px]">
             Three.js
           </span>
           <span className="px-2 py-0.5 text-xs bg-[#FDEEF0] text-[#C53B5A] rounded-[4px]">
             Python
           </span>
-          {/* styled-components を追加 */}
           <span className="px-2 py-0.5 text-xs bg-[#FDEEF0] text-[#C53B5A] rounded-[4px]">
             styled-components
           </span>
@@ -95,7 +99,7 @@ const WorkspaceMockup = () => (
 
     {/* Footer row */}
     <div className="px-5 py-3 border-t border-[#E9E9E7] flex flex-wrap gap-2">
-      {['React', 'TypeScript', 'Node.js', 'Python', 'Three.js', 'styled-components', 'CSS Modules'].map((tech) => (
+      {['React', 'TypeScript', 'Redux', 'Node.js', 'Python', 'Three.js', 'styled-components', 'CSS Modules'].map((tech) => (
         <span
           key={tech}
           className="px-2 py-0.5 text-xs text-[#787774] border border-[#E9E9E7] rounded-[4px] bg-white"
