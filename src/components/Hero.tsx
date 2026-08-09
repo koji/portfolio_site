@@ -10,9 +10,9 @@ export const Hero: React.FC = () => {
   return (
     <section id="home" className="relative overflow-hidden bg-[#191E2C] pt-16">
       {/* Background Decorative Dots */}
-      {DECORATIVE_DOTS.map((dot, index) => (
+      {DECORATIVE_DOTS.map((dot) => (
         <div
-          key={index}
+          key={dot.id}
           aria-hidden="true"
           className={`absolute rounded-full ${dot.className}`}
         />

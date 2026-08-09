@@ -22,6 +22,11 @@ export interface Project {
   stack: TechCategory[];
 }
 
+export interface DecorativeDot {
+  id: string;
+  className: string;
+}
+
 // テックタグのスタイル・ラベル マッピング
 export const TECH_MAP: Record<TechCategory, { label: string; style: string }> = {
   react: { label: 'React', style: 'bg-[#EAF4FE] text-[#1A6FAD]' },
@@ -51,7 +56,7 @@ export const PROJECTS: Project[] = [
     name: 'Opentrons App',
     status: 'active',
     statusLabel: '● Active',
-    stack: ['react', 'ts', 'redux', 'electron', 'node', 'vite', 'css-modules'],
+    stack: ['react', 'ts', 'redux', 'electron', 'vite', 'css-modules'],
   },
   {
     id: 'opentrons-ai',
@@ -65,7 +70,7 @@ export const PROJECTS: Project[] = [
     name: 'IoT Hub System',
     status: 'archived_2020',
     statusLabel: '● 2020',
-    stack: ['webpack', 'ts', 'react', 'redux', 'three', 'python', 'styled', 'node'],
+    stack: ['webpack', 'ts', 'react', 'redux', 'three', 'python', 'styled'],
   },
 ];
 
@@ -81,12 +86,12 @@ export const FEATURED_SKILLS = [
   'CSS Modules',
 ];
 
-// 装飾用背景ドット設定
-export const DECORATIVE_DOTS = [
-  { className: 'top-24 left-12 w-3 h-3 bg-[#FEF0E4] opacity-80' },
-  { className: 'top-40 left-32 w-2 h-2 bg-[#FAED6A] opacity-70' },
-  { className: 'top-20 right-16 w-4 h-4 bg-[#EDFAF4] opacity-70' },
-  { className: 'top-48 right-32 w-2.5 h-2.5 bg-[#F1EFFE] opacity-80' },
-  { className: 'top-36 right-64 w-2 h-2 bg-[#FEF0E4] opacity-60' },
-  { className: 'top-60 left-1/4 w-2 h-2 bg-[#EAF4FE] opacity-70' },
+// 装飾用背景ドット設定（固有の id を付与）
+export const DECORATIVE_DOTS: DecorativeDot[] = [
+  { id: 'dot-peach-top-left', className: 'top-24 left-12 w-3 h-3 bg-[#FEF0E4] opacity-80' },
+  { id: 'dot-yellow-top-left', className: 'top-40 left-32 w-2 h-2 bg-[#FAED6A] opacity-70' },
+  { id: 'dot-green-top-right', className: 'top-20 right-16 w-4 h-4 bg-[#EDFAF4] opacity-70' },
+  { id: 'dot-purple-top-right', className: 'top-48 right-32 w-2.5 h-2.5 bg-[#F1EFFE] opacity-80' },
+  { id: 'dot-peach-top-right', className: 'top-36 right-64 w-2 h-2 bg-[#FEF0E4] opacity-60' },
+  { id: 'dot-blue-mid-left', className: 'top-60 left-1/4 w-2 h-2 bg-[#EAF4FE] opacity-70' },
 ];
