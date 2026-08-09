@@ -29,20 +29,28 @@ const WorkspaceMockup = () => (
             React
           </span>
           <span className="px-2 py-0.5 text-xs bg-[#F1EFFE] text-[#5B46D9] rounded-[4px]">TS</span>
+          <span className="px-2 py-0.5 text-xs bg-[#EDFAF4] text-[#2D7D52] rounded-[4px]">Electron</span>
+          <span className="px-2 py-0.5 text-xs bg-[#FDEEF0] text-[#C53B5A] rounded-[4px]">
+            Vite
+          </span>
         </div>
       </div>
 
       <div className="grid grid-cols-[1fr_auto_auto] gap-4 items-center px-5 py-3">
-        <span className="text-sm text-[#37352F] font-medium">AI Prototype</span>
-        <span className="px-2 py-0.5 text-xs font-medium bg-[#FFFCE5] text-[#B5530C] rounded-[4px] whitespace-nowrap">
-          ● 2024
+        <span className="px-2 py-0.5 text-xs font-medium bg-[#EDFAF4] text-[#2D7D52] rounded-[4px] whitespace-nowrap">
+          ● Active
         </span>
+        <span className="text-sm text-[#37352F] font-medium">Opentrons AI</span>
+        <span className="px-2 py-0.5 text-xs bg-[#F1EFFE] text-[#5B46D9] rounded-[4px]">TS</span>
         <div className="hidden sm:flex gap-1.5">
           <span className="px-2 py-0.5 text-xs bg-[#EAF4FE] text-[#1A6FAD] rounded-[4px]">
             React
           </span>
           <span className="px-2 py-0.5 text-xs bg-[#EDFAF4] text-[#2D7D52] rounded-[4px]">
-            Jotai
+            Zustand
+          </span>
+          <span className="px-2 py-0.5 text-xs bg-[#FDEEF0] text-[#C53B5A] rounded-[4px]">
+            Vite
           </span>
         </div>
       </div>
@@ -50,7 +58,14 @@ const WorkspaceMockup = () => (
       <div className="grid grid-cols-[1fr_auto_auto] gap-4 items-center px-5 py-3">
         <span className="text-sm text-[#37352F] font-medium">IoT Hub System</span>
         <span className="px-2 py-0.5 text-xs font-medium bg-[#FEF0E4] text-[#C25A1C] rounded-[4px] whitespace-nowrap">
-          ● 2020
+                  ● 2020
+        </span>
+        <span className="px-2 py-0.5 text-xs bg-[#FDEEF0] text-[#C53B5A] rounded-[4px]">
+          Webpack
+        </span>
+        <span className="px-2 py-0.5 text-xs bg-[#F1EFFE] text-[#5B46D9] rounded-[4px]">TS</span>
+        <span className="px-2 py-0.5 text-xs bg-[#EAF4FE] text-[#1A6FAD] rounded-[4px]">
+          React
         </span>
         <div className="hidden sm:flex gap-1.5">
           <span className="px-2 py-0.5 text-xs bg-[#F1EFFE] text-[#5B46D9] rounded-[4px]">
