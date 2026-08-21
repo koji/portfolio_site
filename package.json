@@ -12,7 +12,8 @@
     "check": "biome check --apply .",
     "preview": "vite preview",
     "test": "vitest",
-    "test:run": "vitest run"
+    "test:run": "vitest run",
+    "doctor": "npx react-doctor@latest"
   },
   "dependencies": {
     "@radix-ui/react-dropdown-menu": "^2.1.1",

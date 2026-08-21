@@ -1,8 +1,8 @@
-import React from 'react';
 import { TechCategory, ProjectStatus, TECH_MAP, STATUS_MAP } from '../types/hero';
+import type { ReactNode } from 'react';
 
 // 技術タグバッジ
-export const TechBadge: React.FC<{ category: TechCategory }> = ({ category }) => {
+export const TechBadge = ({ category }: { category: TechCategory }): ReactNode => {
   const tech = TECH_MAP[category];
   if (!tech) return null;
   return (
@@ -13,10 +13,7 @@ export const TechBadge: React.FC<{ category: TechCategory }> = ({ category }) =>
 };
 
 // ステータスバッジ
-export const StatusBadge: React.FC<{ status: ProjectStatus; label: string }> = ({
-  status,
-  label,
-}) => {
+export const StatusBadge = ({ status, label }: { status: ProjectStatus; label: string }): ReactNode => {
   const config = STATUS_MAP[status];
   return (
     <span

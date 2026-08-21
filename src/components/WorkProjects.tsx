@@ -1,13 +1,13 @@
 import { ProjectLink } from '@/components/ProjectLink';
 import { workProjects } from '@/data/workPrjData';
-import React from 'react';
+import type { ReactNode } from 'react';
 
 const companyTints: Record<string, { bg: string; text: string }> = {
   Opentrons: { bg: '#FEF0E4', text: '#C25A1C' },
   'Ubiquiti Networks': { bg: '#FDEEF0', text: '#C53B5A' },
 };
 
-export const WorkProjects = () => {
+export const WorkProjects = (): ReactNode => {
   return (
     <section id="work" className="py-24 px-4 sm:px-6 lg:px-8 bg-[#F7F6F3]">
       <div className="max-w-6xl mx-auto">

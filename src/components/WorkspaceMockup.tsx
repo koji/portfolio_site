@@ -1,8 +1,9 @@
-import React from 'react';
 import { PROJECTS, FEATURED_SKILLS } from '../types/hero';
 import { TechBadge, StatusBadge } from './TechBadge';
 
-export const WorkspaceMockup: React.FC = () => (
+import type { ReactNode } from 'react';
+
+export const WorkspaceMockup = (): ReactNode => (
   <div className="bg-white rounded-[12px] border border-[#E9E9E7] shadow-notion-mockup overflow-hidden text-left">
     {/* Header */}
     <div className="flex items-center gap-2 px-5 py-3.5 border-b border-[#E9E9E7]">
@@ -14,52 +15,58 @@ export const WorkspaceMockup: React.FC = () => (
       </span>
     </div>
 
-    {/* Table / Grid Content */}
-    <div role="table" aria-label="Project list">
+    {/* Table Content */}
+    <table className="w-full border-collapse" aria-label="Project list">
       {/* Table Header */}
-      <div
-        role="rowgroup"
-        className="grid grid-cols-[1fr_auto_auto] gap-4 px-5 py-2.5 bg-[#F7F6F3] border-b border-[#E9E9E7]"
-      >
-        <div role="columnheader" className="text-xs font-medium text-[#9B9A97] uppercase tracking-wide">
-          Project
-        </div>
-        <div role="columnheader" className="text-xs font-medium text-[#9B9A97] uppercase tracking-wide">
-          Status
-        </div>
-        <div role="columnheader" className="text-xs font-medium text-[#9B9A97] uppercase tracking-wide hidden sm:block">
-          Stack
-        </div>
-      </div>
+      <thead>
+        <tr className="bg-[#F7F6F3] border-b border-[#E9E9E7]">
+          <th
+            scope="col"
+            className="px-5 py-2.5 text-left text-xs font-medium text-[#9B9A97] uppercase tracking-wide"
+          >
+            Project
+          </th>
+          <th
+            scope="col"
+            className="px-5 py-2.5 text-left text-xs font-medium text-[#9B9A97] uppercase tracking-wide"
+          >
+            Status
+          </th>
+          <th
+            scope="col"
+            className="px-5 py-2.5 text-left text-xs font-medium text-[#9B9A97] uppercase tracking-wide hidden sm:table-cell"
+          >
+            Stack
+          </th>
+        </tr>
+      </thead>
 
       {/* Table Body Rows */}
-      <div role="rowgroup" className="divide-y divide-[#E9E9E7]">
+      <tbody className="divide-y divide-[#E9E9E7]">
         {PROJECTS.map((project) => (
-          <div
-            key={project.id}
-            role="row"
-            className="grid grid-cols-[1fr_auto_auto] gap-4 items-center px-5 py-3"
-          >
+          <tr key={project.id} className="hover:bg-[#FBFBFA] transition-colors">
             {/* Column 1: Title */}
-            <div role="cell" className="text-sm text-[#37352F] font-medium">
+            <td className="px-5 py-3 text-sm text-[#37352F] font-medium align-middle">
               {project.name}
-            </div>
+            </td>
 
             {/* Column 2: Status */}
-            <div role="cell">
+            <td className="px-5 py-3 align-middle">
               <StatusBadge status={project.status} label={project.statusLabel} />
-            </div>
+            </td>
 
             {/* Column 3: Stack Badges */}
-            <div role="cell" className="hidden sm:flex gap-1.5 flex-wrap">
-              {project.stack.map((techKey) => (
-                <TechBadge key={techKey} category={techKey} />
-              ))}
-            </div>
-          </div>
+            <td className="px-5 py-3 align-middle hidden sm:table-cell">
+              <div className="flex gap-1.5 flex-wrap">
+                {project.stack.map((techKey) => (
+                  <TechBadge key={techKey} category={techKey} />
+                ))}
+              </div>
+            </td>
+          </tr>
         ))}
-      </div>
-    </div>
+      </tbody>
+    </table>
 
     {/* Footer row */}
     <div className="px-5 py-3 border-t border-[#E9E9E7] flex flex-wrap gap-2">
@@ -74,3 +81,5 @@ export const WorkspaceMockup: React.FC = () => (
     </div>
   </div>
 );
+
+export default WorkspaceMockup;

@@ -1,5 +1,5 @@
 import { personalProjects } from '@/data/personalPrjData';
-import React from 'react';
+import type { ReactNode } from 'react';
 
 const CARD_TINTS = [
   '#FEF0E4', // peach
@@ -26,7 +26,7 @@ const categoryIcons: Record<string, string> = {
   library: '📚',
 };
 
-const PersonalProjects = () => {
+export const PersonalProjects = (): ReactNode => {
   const reversedProjects = [...personalProjects].reverse();
 
   return (
@@ -93,7 +93,7 @@ const PersonalProjects = () => {
                     <button
                       type="button"
                       className="flex-1 py-1.5 text-xs font-medium text-[#37352F] bg-white border border-[#E9E9E7] rounded-[8px] hover:bg-[#F7F6F3] transition-colors"
-                      onClick={() => window.open(project.githubUrl, '_blank')}
+                      onClick={() => window.open(project.githubUrl, '_blank', 'noopener')}
                     >
                       GitHub
                     </button>
@@ -102,7 +102,7 @@ const PersonalProjects = () => {
                     <button
                       type="button"
                       className="flex-1 py-1.5 text-xs font-medium text-white bg-[#7766E4] rounded-[8px] hover:bg-[#6655D8] transition-colors"
-                      onClick={() => window.open(project.liveUrl, '_blank')}
+                      onClick={() => window.open(project.liveUrl, '_blank', 'noopener')}
                     >
                       Live Demo
                     </button>
