@@ -7,12 +7,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
-import type { MouseEvent } from "react";
+import type { MouseEvent, ReactNode } from "react";
 
 const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const handleNavClick = (e: MouseEvent<HTMLElement>, sectionId: string) => {
+  const handleNavClick = (e: MouseEvent<HTMLElement>, sectionId: string):ReactNode => {
     if (
       e.defaultPrevented ||
       e.button !== 0 ||

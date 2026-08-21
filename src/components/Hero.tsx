@@ -1,12 +1,12 @@
-import React from 'react';
 import { DECORATIVE_DOTS } from '../types/hero';
 import { WorkspaceMockup } from './WorkspaceMockup';
+import type { ReactNode } from 'react';
 
-export const Hero: React.FC = () => {
-  const handleScrollTo = (id: string) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
-  };
+const handleScrollTo = (id: string) => {
+  document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+};
 
+export const Hero = (): ReactNode => {
   return (
     <section id="home" className="relative overflow-hidden bg-[#191E2C] pt-16">
       {/* Background Decorative Dots */}

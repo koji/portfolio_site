@@ -1,6 +1,6 @@
-import React from 'react';
+import type { ReactNode } from 'react';
 
-const Contact = () => {
+const Contact = (): ReactNode => {
   return (
     <section id="contact" className="py-24 px-4 sm:px-6 lg:px-8 bg-[#F7F6F3]">
       <div className="max-w-3xl mx-auto">
@@ -44,7 +44,7 @@ const Contact = () => {
             <button
               type="button"
               className="flex-1 flex items-center justify-center gap-2 py-3 text-sm font-medium text-[#45413C] border border-[#45413C]/30 bg-transparent rounded-[8px] hover:bg-[#45413C]/10 transition-colors"
-              onClick={() => window.open('https://baxin.pages.dev/', '_blank')}
+              onClick={() => window.open('https://baxin.pages.dev/', '_blank', 'noopener')}
             >
               <span>📖</span>
               <span>Read My Blog</span>

@@ -1,7 +1,7 @@
 import { frontendTechStack, otherTechStack } from '@/data/techStackData';
-import React from 'react';
+import type { ReactNode } from 'react';
 
-const About = () => {
+const About = (): ReactNode => {
   return (
     <section id="about" className="py-24 px-4 sm:px-6 lg:px-8 bg-white">
       <div className="max-w-6xl mx-auto">
