@@ -27,6 +27,8 @@ export const workProjects: WorkProject[] = [
     ],
     period: '2022 - Present',
     highlights: [
+      'Led migration from styled-components to CSS Modules',
+      'Switched the node package manager from yarn v1 to pnpm',
       'Added a new feature when re-designing the Desktop app',
       'Setup touchscreen app dev environment and developed 40% of touch screen app UI',
       'Increased test coverage by 5%',
