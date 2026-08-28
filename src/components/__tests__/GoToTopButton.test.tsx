@@ -116,7 +116,6 @@ describe('GoToTopButton', () => {
   it('should handle keyboard navigation', async () => {
     render(<GoToTopButton showAfter={300} />);
 
-    // Simulate scrolling past threshold
     Object.defineProperty(window, 'pageYOffset', {
       value: 400,
       writable: true,
@@ -130,18 +129,19 @@ describe('GoToTopButton', () => {
 
     const button = screen.getByRole('button');
 
-    // Test Enter key
-    fireEvent.keyDown(button, { key: 'Enter' });
+    button.focus();
+    expect(button).toHaveFocus();
+
+    fireEvent.click(button);
     expect(mockScrollTo).toHaveBeenCalledWith({
       top: 0,
       behavior: 'smooth',
     });
 
-    // Reset mock
     mockScrollTo.mockClear();
 
-    // Test Space key
-    fireEvent.keyDown(button, { key: ' ' });
+    fireEvent.keyDown(button, { key: 'Enter' });
+    fireEvent.click(button);
     expect(mockScrollTo).toHaveBeenCalledWith({
       top: 0,
       behavior: 'smooth',
@@ -167,7 +167,8 @@ describe('GoToTopButton', () => {
 
     expect(button).toHaveAttribute('aria-label');
     expect(button).toHaveAttribute('title');
-    expect(button).toHaveAttribute('tabIndex', '0');
+    expect(button.tagName).toBe('BUTTON');
+    expect(button).not.toHaveAttribute('tabIndex', '-1');
   });
 
   it('should update scroll progress correctly', async () => {

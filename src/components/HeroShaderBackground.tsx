@@ -169,7 +169,7 @@ export const HeroShaderBackground = () => {
 
     program = tryCreate(N, M);
     if (!program && (N > 600 || M > 300)) {
-      console.warn(`[HeroShader] retry with lower quality N=600 M=300`);
+      console.warn('[HeroShader] retry with lower quality N=600 M=300');
       N = 600;
       M = 300;
       program = tryCreate(N, M);
@@ -275,6 +275,7 @@ export const HeroShaderBackground = () => {
   }
 
   return (
+    // biome-ignore lint/a11y/noAriaHiddenOnFocusable: canvas is decorative and not focusable
     <canvas
       ref={canvasRef}
       aria-hidden="true"
