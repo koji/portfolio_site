@@ -65,7 +65,7 @@ export const workProjects: WorkProject[] = [
     id: 4,
     title: 'Internal tools',
     company: 'Opentrons',
-    description: 'Building internal tools to support software team. Dashbaord app, chrome extension for debugging, and VSCode extension',
+    description: 'Building internal tools to support software team. Dashboard app, chrome extension for debugging, and VSCode extension',
     technologies: ['React', 'TypeScript', 'vite', 'vitest', 'chrome-extension', 'Cursor'],
     period: '2025 - Present',
     highlights: ['Building internal tools'],
