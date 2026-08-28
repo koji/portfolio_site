@@ -82,4 +82,3 @@ export const WorkspaceMockup = (): ReactNode => (
   </div>
 );
 
-export default WorkspaceMockup;

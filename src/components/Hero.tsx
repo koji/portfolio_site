@@ -7,7 +7,7 @@ const handleScrollTo = (id: string) => {
   document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
 };
 
-export const Hero = (): ReactNode => {
+const Hero = (): ReactNode => {
   return (
     <section id="home" className="relative overflow-hidden bg-[#191E2C] pt-16">
       {/* Shader Background */}

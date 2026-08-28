@@ -26,7 +26,7 @@ const categoryIcons: Record<string, string> = {
   library: '📚',
 };
 
-export const PersonalProjects = (): ReactNode => {
+const PersonalProjects = (): ReactNode => {
   const reversedProjects = [...personalProjects].reverse();
 
   return (

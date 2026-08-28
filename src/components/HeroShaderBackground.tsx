@@ -284,4 +284,3 @@ export const HeroShaderBackground = () => {
   );
 };
 
-export default HeroShaderBackground;
