@@ -8,6 +8,7 @@ const companyTints: Record<string, { bg: string; text: string }> = {
 };
 
 export const WorkProjects = (): ReactNode => {
+  const sortedProjects = workProjects.toSorted((a, b) => b.id - a.id);
   return (
     <section id="work" className="py-24 px-4 sm:px-6 lg:px-8 bg-[#F7F6F3]">
       <div className="max-w-6xl mx-auto">
@@ -23,7 +24,7 @@ export const WorkProjects = (): ReactNode => {
 
         {/* Projects */}
         <div className="space-y-6">
-          {workProjects.map((project) => {
+          {sortedProjects.map((project) => {
             const tint = companyTints[project.company] ?? {
               bg: '#F5F5F4',
               text: '#787774',
