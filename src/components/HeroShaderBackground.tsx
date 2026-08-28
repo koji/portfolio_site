@@ -181,7 +181,7 @@ export const HeroShaderBackground = () => {
       return;
     }
 
-    console.log(`[HeroShader] shader compiled OK N=${N} M=${M}`);
+    // console.log(`[HeroShader] shader compiled OK N=${N} M=${M}`);
 
     const positionLoc = gl.getAttribLocation(program, 'position');
     const timeLoc = gl.getUniformLocation(program, 'iTime');
@@ -193,7 +193,7 @@ export const HeroShaderBackground = () => {
 
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
     const prefersReducedMotion = mediaQuery.matches;
-    console.log('[HeroShader] prefersReducedMotion:', prefersReducedMotion);
+    // console.log('[HeroShader] prefersReducedMotion:', prefersReducedMotion);
     // アニメーションは常に実行。reduce の場合は速度を落とすのみ（完全停止はしない）
     let isVisible = document.visibilityState === 'visible';
     const onVisibility = () => {
