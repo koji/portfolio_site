@@ -1,5 +1,5 @@
 interface WorkProject {
-  id: string;
+  id: number;
   title: string;
   company: string;
   description: string;
@@ -11,7 +11,21 @@ interface WorkProject {
 
 export const workProjects: WorkProject[] = [
   {
-    id: '1',
+    id: 1,
+    title: 'Unify Home - IoT hub system',
+    company: 'Ubiquiti Networks',
+    description:
+      'Developed an IoT hub system that was based on Home Assistant. The system allowed users to control their home devices from a web app.',
+    technologies: ['React', 'TypeScript', 'Threejs', 'Nodejs', 'Python', 'Home Assistant'],
+    period: '2018 - 2020',
+    highlights: [
+      'Allowed users to control IoT devices from a 3D model viewer',
+      'Space recognition that was based on an object detection',
+      'iOS object detection prototype app',
+    ],
+  },
+  {
+    id: 2,
     title: 'Opentrons Desktop App/Touchscreen App',
     company: 'Opentrons',
     description:
@@ -32,11 +46,13 @@ export const workProjects: WorkProject[] = [
       'Added a new feature when re-designing the Desktop app',
       'Setup touchscreen app dev environment and developed 40% of touch screen app UI',
       'Increased test coverage by 5%',
+      'Protocol Visualization',
+      'ODD external keyboard support',
     ],
     link: 'https://github.com/Opentrons/opentrons',
   },
   {
-    id: '2',
+    id: 3,
     title: 'Opentrons AI prototype',
     company: 'Opentrons',
     description: 'Designed frontend architecture and built Opentrons AI prototype frontend',
@@ -46,17 +62,23 @@ export const workProjects: WorkProject[] = [
     link: 'https://github.com/Opentrons/opentrons',
   },
   {
-    id: '3',
-    title: 'Unify Home - IoT hub system',
-    company: 'Ubiquiti Networks',
-    description:
-      'Developed an IoT hub system that was based on Home Assistant. The system allowed users to control their home devices from a web app.',
-    technologies: ['React', 'TypeScript', 'Threejs', 'Nodejs', 'Python', 'Home Assistant'],
-    period: '2018 - 2020',
-    highlights: [
-      'Allowed users to control IoT devices from a 3D model viewer',
-      'Space recognition that was based on an object detection',
-      'iOS object detection prototype app',
-    ],
+    id: 4,
+    title: 'Internal tools',
+    company: 'Opentrons',
+    description: 'Building internal tools to support software team. Dashbaord app, chrome extension for debugging, and VSCode extension',
+    technologies: ['React', 'TypeScript', 'vite', 'vitest', 'chrome-extension', 'Cursor'],
+    period: '2025 - Present',
+    highlights: ['Building internal tools'],
+    link: '',
+  },
+  {
+    id: 5,
+    title: 'New application',
+    company: 'Opentrons',
+    description: 'Building new application',
+    technologies: [],
+    period: '2026 - Present',
+    highlights: ['Building internal tools'],
+    link: '',
   },
 ];
