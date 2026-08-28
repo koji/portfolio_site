@@ -6,7 +6,7 @@ interface PersonalProject {
   githubUrl?: string;
   liveUrl?: string;
   status: 'completed' | 'in-progress' | 'planned';
-  category: 'web' | 'mobile' | 'cli' | 'library' | 'chrome-extension';
+  category: 'web' | 'mobile' | 'cli' | 'library' | 'chrome-extension' | 'vscode-extension';
 }
 
 export const personalProjects: PersonalProject[] = [
@@ -315,5 +315,15 @@ export const personalProjects: PersonalProject[] = [
     githubUrl: 'https://github.com/koji/hakoniwa-term',
     status: 'in-progress',
     category: 'library',
+  },
+  {
+    id: 'oss-12',
+    title: 'protocol visualizer',
+    description:'A VSCode extension that visualize an Opentrons protocol of Flex/OT-2',
+    technologies: ['react', 'typescript', 'pnpm', 'vscode extension', 'web', 'node'],
+    liveUrl: 'https://protocol-visualizer.netlify.app/',
+    githubUrl: 'https://github.com/koji/protocol-visualizer-web',
+    status: 'in-progress',
+    category: 'vscode-extension',
   },
 ];
