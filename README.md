@@ -23,15 +23,12 @@ A modern, responsive portfolio website built with React and TypeScript. This pro
 
 ## 📦 Installation
 
-Make sure you have [Node.js](https://nodejs.org/), [bun](https://bun.com/) or [pnpm](https://pnpm.io/) installed.
+Make sure you have [Node.js](https://nodejs.org/), [bun](https://bun.com/) installed.
 
-```bash
+```shell
 # Clone the repository
 git clone https://github.com/koji/portfolio_site.git
 cd portfolio_site
-
-# Install dependencies pnpm
-pnpm install
 
 # Install dependencies via bun
 bun install
@@ -40,26 +37,21 @@ bun install
 
 ## 🧰 Available Scripts
 
-```bash
+```shell
 # Start development server
 bun run dev
-pnpm dev
 
 # Build for production
 bun run build
-pnpm build
 
 # Build for development
 bun run build:dev
-pnpm build:dev
 
 # Lint code
 bun run lint
-pnpm lint
 
 # Preview production build
 bun run preview
-pnpm preview
 ```
 
 ## 🚧 Development
@@ -67,7 +59,6 @@ pnpm preview
 1. Start the development server:
    ```bash
    bun run dev
-   pnpm dev
    ```
 
 2. Open your browser and visit [http://localhost:5173/](http://localhost:5173/)
@@ -80,7 +71,6 @@ Build the project for production:
 
 ```bash
 bun run build
-pnpm build
 ```
 
 The build artifacts will be stored in the `dist/` directory, ready to be deployed to your hosting provider of choice.
