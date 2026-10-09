@@ -20,6 +20,7 @@ export default {
       fontFamily: {
         inter: ['Inter', 'sans-serif'],
         japanese: ['Noto Sans JP', 'sans-serif'],
+        paper: ['"Paper Mono"', 'ui-monospace', 'monospace'],
       },
       colors: {
         border: 'hsl(var(--border))',
