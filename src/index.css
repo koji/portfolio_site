@@ -1,4 +1,12 @@
 
+@font-face {
+  font-family: "Paper Mono";
+  src: url("/fonts/PaperMono[wght].woff2") format("woff2-variations");
+  font-weight: 100 800;
+  font-style: normal;
+  font-display: swap;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

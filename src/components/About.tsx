@@ -66,7 +66,7 @@ const About = (): ReactNode => {
                     {frontendTechStack.map((tech) => (
                       <span
                         key={tech}
-                        className="px-2.5 py-1 bg-white text-[#37352F] border border-[#E9E9E7] rounded-[6px] text-sm font-medium"
+                        className="px-2.5 py-1 bg-white text-[#37352F] border border-[#E9E9E7] rounded-[6px] text-sm font-medium font-paper"
                       >
                         {tech}
                       </span>
@@ -82,7 +82,7 @@ const About = (): ReactNode => {
                     {otherTechStack.map((tech) => (
                       <span
                         key={tech}
-                        className="px-2.5 py-1 bg-white text-[#37352F] border border-[#E9E9E7] rounded-[6px] text-sm font-medium"
+                        className="px-2.5 py-1 bg-white text-[#37352F] border border-[#E9E9E7] rounded-[6px] text-sm font-medium font-paper"
                       >
                         {tech}
                       </span>
